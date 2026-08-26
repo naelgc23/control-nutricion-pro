@@ -1,0 +1,30 @@
+{
+  "name": "control-nutricion-pro",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sync": "cap sync",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.2",
+    "react-select": "^5.10.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.4.0",
+    "@capacitor/cli": "^5.4.0",
+    "@capacitor/core": "^5.4.0",
+    "@capacitor/ios": "^5.4.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "lucide-react": "^0.263.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.5"
+  }
+}

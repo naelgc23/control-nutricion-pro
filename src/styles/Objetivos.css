@@ -1,0 +1,201 @@
+.objetivos {
+  animation: fadeIn 0.3s ease;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.goals-grid .form-group {
+  background: #f7fafc;
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+}
+
+.goals-grid label {
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.goals-grid input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #667eea;
+  transition: border-color 0.3s;
+}
+
+.goals-grid input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.goals-grid small {
+  display: block;
+  margin-top: 5px;
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.info-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.info-section h3 {
+  color: #2d3748;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.formula-card {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 4px solid #667eea;
+}
+
+.formula-card h4 {
+  color: #667eea;
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+}
+
+.formula-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.formula-card li {
+  color: #4a5568;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  padding-left: 25px;
+  position: relative;
+}
+
+.formula-card li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #48bb78;
+  font-weight: bold;
+}
+
+.formula-card li:last-child {
+  margin-bottom: 0;
+}
+
+.disclaimer {
+  background: linear-gradient(135deg, #fef5e7 0%, #fef9e7 100%);
+  border: 2px solid #f39c12;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.disclaimer p {
+  color: #7d6608;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tips-list li {
+  padding: 12px 0;
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tips-list li:last-child {
+  border-bottom: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .goals-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .info-section {
+    padding: 15px;
+  }
+
+  .formula-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .goals-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .goals-grid .form-group {
+    padding: 12px;
+  }
+
+  .goals-grid label {
+    font-size: 0.9rem;
+  }
+
+  .info-section {
+    padding: 12px;
+  }
+
+  .formula-card {
+    padding: 12px;
+    border-left-width: 3px;
+  }
+
+  .formula-card h4 {
+    font-size: 0.95rem;
+  }
+
+  .formula-card li {
+    font-size: 0.85rem;
+  }
+}

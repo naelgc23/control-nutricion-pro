@@ -1,0 +1,17 @@
+{
+  "appId": "com.nutricionpro.app",
+  "appName": "Control Nutrición Pro",
+  "webDir": "build",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

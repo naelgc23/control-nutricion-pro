@@ -1,0 +1,161 @@
+.registro {
+  animation: fadeIn 0.3s ease;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.nutrient-info {
+  background: linear-gradient(135deg, #f0f4ff 0%, #f5f7ff 100%);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.nutrient-info p {
+  margin-bottom: 15px;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.nutrient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.nutrient-grid div {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.nutrient-grid strong {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.consumptions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 0.85rem;
+}
+
+.consumptions-table thead {
+  background: #f7fafc;
+}
+
+.consumptions-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  color: #2d3748;
+}
+
+.consumptions-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.consumptions-table tbody tr:hover {
+  background: #f7fafc;
+}
+
+.btn-delete {
+  background: #f56565;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-delete:hover {
+  background: #e53e3e;
+  transform: scale(1.05);
+}
+
+.alert {
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: block;
+  animation: slideIn 0.3s ease;
+}
+
+.alert-success {
+  background: #c6f6d5;
+  color: #22543d;
+  border-left: 4px solid #48bb78;
+}
+
+.alert-error {
+  background: #fed7d7;
+  color: #742a2a;
+  border-left: 4px solid #f56565;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 30px 20px;
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .nutrient-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .consumptions-table {
+    font-size: 0.75rem;
+  }
+
+  .consumptions-table th,
+  .consumptions-table td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-group input,
+  .form-group select {
+    padding: 10px;
+  }
+
+  .nutrient-info {
+    padding: 15px;
+  }
+}
