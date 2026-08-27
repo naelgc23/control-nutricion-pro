@@ -1,186 +1,214 @@
-import React, { useState, useMemo } from 'react';
-import '../styles/Registro.css';
+import React, { useState } from 'react'
+import Select from 'react-select'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { getDefaultFoods } from '../App'
+import '../styles/Registro.css'
 
-function Registro({ foods, consumptions, setConsumptions }) {
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
-  const [comida, setComida] = useState('');
-  const [foodIdx, setFoodIdx] = useState('');
-  const [gramos, setGramos] = useState(100);
-  const [alert, setAlert] = useState(null);
+export default function Registro() {
+  const [foods] = useLocalStorage('foods', getDefaultFoods())
+  const [consumptions, setConsumptions] = useLocalStorage('consumptions', [])
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedMeal, setSelectedMeal] = useState('')
+  const [selectedFood, setSelectedFood] = useState(null)
+  const [grams, setGrams] = useState('')
+  const [message, setMessage] = useState('')
 
-  const selectedFood = foodIdx !== '' ? foods[foodIdx] : null;
+  const mealTypes = ['Desayuno', 'Media mañana', 'Comida', 'Merienda', 'Cena', 'Snack']
 
-  const nutrientInfo = useMemo(() => {
-    if (!selectedFood) return null;
-    const mult = gramos / 100;
-    return {
-      kcal: Math.round(selectedFood.kcal * mult),
-      protein: (selectedFood.protein * mult).toFixed(1),
-      fats: (selectedFood.fats * mult).toFixed(1),
-      carbs: (selectedFood.carbs * mult).toFixed(1),
-      fiber: (selectedFood.fiber * mult).toFixed(1)
-    };
-  }, [selectedFood, gramos]);
+  // Convertir alimentos a formato react-select
+  const foodOptions = foods.map(food => ({
+    value: food.name,
+    label: `${food.name} (${food.kcal} kcal/100g)`,
+    food: food
+  }))
 
-  const todayConsumptions = useMemo(() => {
-    return consumptions.filter(c => c.date === fecha);
-  }, [consumptions, fecha]);
-
-  const handleAddConsumption = () => {
-    if (!fecha || !comida || foodIdx === '') {
-      showAlert('Por favor completa todos los campos', 'error');
-      return;
+  const handleRegister = () => {
+    if (!selectedFood || !grams || grams <= 0) {
+      setMessage('Por favor selecciona alimento y cantidad')
+      setTimeout(() => setMessage(''), 3000)
+      return
     }
 
-    const food = foods[foodIdx];
-    const mult = gramos / 100;
+    const food = selectedFood.food
+    const consumedGrams = parseFloat(grams)
+    const multiplier = consumedGrams / 100
 
     const newConsumption = {
       id: Date.now(),
-      date: fecha,
-      meal: comida,
+      date: selectedDate,
+      meal: selectedMeal,
       foodName: food.name,
-      grams: gramos,
-      kcal: Math.round(food.kcal * mult),
-      protein: parseFloat((food.protein * mult).toFixed(1)),
-      fats: parseFloat((food.fats * mult).toFixed(1)),
-      carbs: parseFloat((food.carbs * mult).toFixed(1)),
-      fiber: parseFloat((food.fiber * mult).toFixed(1))
-    };
+      grams: consumedGrams,
+      kcal: Math.round(food.kcal * multiplier),
+      protein: Math.round(food.protein * multiplier * 10) / 10,
+      fats: Math.round(food.fats * multiplier * 10) / 10,
+      carbs: Math.round(food.carbs * multiplier * 10) / 10,
+      fiber: Math.round(food.fiber * multiplier * 10) / 10
+    }
 
-    setConsumptions([...consumptions, newConsumption]);
-    setFoodIdx('');
-    setGramos(100);
-    setComida('');
-    showAlert('✅ Consumo registrado correctamente', 'success');
-  };
+    setConsumptions([...consumptions, newConsumption])
+    setMessage('✅ Registrado correctamente')
+    setSelectedFood(null)
+    setGrams('')
+    setTimeout(() => setMessage(''), 3000)
+  }
 
-  const handleDeleteConsumption = (id) => {
-    setConsumptions(consumptions.filter(c => c.id !== id));
-    showAlert('✅ Registro eliminado', 'success');
-  };
+  const todayConsumptions = consumptions.filter(c => c.date === selectedDate)
+  const selectedFoodData = selectedFood?.food
 
-  const showAlert = (message, type) => {
-    setAlert({ message, type });
-    setTimeout(() => setAlert(null), 3000);
-  };
+  const customStyles = {
+    control: (base) => ({
+      ...base,
+      borderColor: '#e2e8f0',
+      borderWidth: '2px',
+      borderRadius: '8px',
+      padding: '4px',
+      fontSize: '1rem',
+      '&:hover': {
+        borderColor: '#667eea'
+      }
+    }),
+    menu: (base) => ({
+      ...base,
+      borderRadius: '8px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#667eea' : state.isFocused ? '#f0f4ff' : 'white',
+      color: state.isSelected ? 'white' : '#2d3748',
+      cursor: 'pointer',
+      padding: '12px'
+    })
+  }
 
   return (
     <div className="registro">
-      {alert && (
-        <div className={`alert alert-${alert.type}`}>
-          {alert.message}
+      <h2>📝 Registrar Consumo</h2>
+
+      <div className="form-group">
+        <label>Fecha</label>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Tipo de Comida</label>
+        <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
+          <option value="">-- Selecciona comida --</option>
+          {mealTypes.map(meal => (
+            <option key={meal} value={meal}>{meal}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>🔍 Buscar Alimento</label>
+        <Select
+          options={foodOptions}
+          value={selectedFood}
+          onChange={setSelectedFood}
+          placeholder="Escribe para buscar alimento..."
+          isClearable
+          isSearchable
+          styles={customStyles}
+          noOptionsMessage={() => 'Alimento no encontrado'}
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Cantidad (gramos)</label>
+        <input
+          type="number"
+          value={grams}
+          onChange={(e) => setGrams(e.target.value)}
+          placeholder="Ej: 150"
+          min="1"
+          step="0.1"
+        />
+      </div>
+
+      {selectedFoodData && grams && (
+        <div className="nutrient-info">
+          <p>📊 Macros para {grams}g de {selectedFood.value}:</p>
+          <div className="nutrient-grid">
+            <div>
+              <strong>{Math.round(selectedFoodData.kcal * (grams / 100))}</strong> kcal
+            </div>
+            <div>
+              <strong>{Math.round(selectedFoodData.protein * (grams / 100) * 10) / 10}</strong> g proteína
+            </div>
+            <div>
+              <strong>{Math.round(selectedFoodData.fats * (grams / 100) * 10) / 10}</strong> g grasas
+            </div>
+            <div>
+              <strong>{Math.round(selectedFoodData.carbs * (grams / 100) * 10) / 10}</strong> g carbs
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="card">
-        <h2>📝 Registrar Consumo</h2>
+      <button onClick={handleRegister} className="btn-primary">
+        Registrar Consumo
+      </button>
 
-        <div className="form-group">
-          <label>📅 Fecha</label>
-          <input
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-          />
+      {message && (
+        <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}`}>
+          {message}
         </div>
+      )}
 
-        <div className="form-group">
-          <label>🍽️ Tipo de Comida</label>
-          <select value={comida} onChange={(e) => setComida(e.target.value)}>
-            <option value="">Seleccionar...</option>
-            <option value="Desayuno">Desayuno</option>
-            <option value="Media mañana">Media mañana</option>
-            <option value="Comida">Comida</option>
-            <option value="Merienda">Merienda</option>
-            <option value="Cena">Cena</option>
-            <option value="Snack">Snack</option>
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>🍎 Alimento</label>
-          <select value={foodIdx} onChange={(e) => setFoodIdx(e.target.value)}>
-            <option value="">Seleccionar...</option>
-            {foods.map((food, idx) => (
-              <option key={idx} value={idx}>
-                {food.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>⚖️ Gramos</label>
-          <input
-            type="number"
-            value={gramos}
-            onChange={(e) => setGramos(parseInt(e.target.value) || 100)}
-            min="1"
-          />
-        </div>
-
-        {nutrientInfo && (
-          <div className="nutrient-info">
-            <p><strong>Macros para esta ración:</strong></p>
-            <div className="nutrient-grid">
-              <div>🔥 Kcal: <strong>{nutrientInfo.kcal}</strong></div>
-              <div>💪 Proteína: <strong>{nutrientInfo.protein}g</strong></div>
-              <div>🧈 Grasas: <strong>{nutrientInfo.fats}g</strong></div>
-              <div>🌾 Hidratos: <strong>{nutrientInfo.carbs}g</strong></div>
-            </div>
-          </div>
-        )}
-
-        <button className="btn btn-primary" onClick={handleAddConsumption}>
-          ➕ Registrar Consumo
-        </button>
-      </div>
-
-      <div className="card">
-        <h2>Registros de {new Date(fecha).toLocaleDateString('es-ES')}</h2>
-        {todayConsumptions.length > 0 ? (
-          <table className="consumptions-table">
-            <thead>
-              <tr>
-                <th>Comida</th>
-                <th>Alimento</th>
-                <th>Grs</th>
-                <th>Kcal</th>
-                <th>Prot</th>
-                <th>Grs</th>
-                <th>HC</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {todayConsumptions.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.meal}</td>
-                  <td>{c.foodName}</td>
-                  <td>{c.grams}</td>
-                  <td>{c.kcal}</td>
-                  <td>{c.protein.toFixed(1)}</td>
-                  <td>{c.fats.toFixed(1)}</td>
-                  <td>{c.carbs.toFixed(1)}</td>
-                  <td>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDeleteConsumption(c.id)}
-                    >
-                      ✕
-                    </button>
-                  </td>
+      {todayConsumptions.length > 0 && (
+        <>
+          <h3>📋 Registros de hoy</h3>
+          <div className="table-container">
+            <table className="consumptions-table">
+              <thead>
+                <tr>
+                  <th>Comida</th>
+                  <th>Alimento</th>
+                  <th>Cantidad</th>
+                  <th>Kcal</th>
+                  <th>P</th>
+                  <th>G</th>
+                  <th>C</th>
+                  <th>Acción</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="empty-message">No hay registros para esta fecha</p>
-        )}
-      </div>
-    </div>
-  );
-}
+              </thead>
+              <tbody>
+                {todayConsumptions.map(consumption => (
+                  <tr key={consumption.id}>
+                    <td>{consumption.meal}</td>
+                    <td>{consumption.foodName}</td>
+                    <td>{consumption.grams}g</td>
+                    <td>{consumption.kcal}</td>
+                    <td>{consumption.protein}g</td>
+                    <td>{consumption.fats}g</td>
+                    <td>{consumption.carbs}g</td>
+                    <td>
+                      <button
+                        onClick={() => setConsumptions(consumptions.filter(c => c.id !== consumption.id))}
+                        className="btn-delete"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
-export default Registro;
+      {todayConsumptions.length === 0 && (
+        <div className="empty-message">
+          No hay registros para hoy. ¡Comienza a registrar! 🍎
+        </div>
+      )}
+    </div>
+  )
+}

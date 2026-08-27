@@ -64,7 +64,7 @@ function App() {
   );
 }
 
-function getDefaultFoods() {
+export function getDefaultFoods() {
   return [
     { name: 'Pavo extrafino Hacendado', kcal: 89, protein: 19.5, fats: 1.3, carbs: 1.0, fiber: 0.0 },
     { name: 'Pan cereales Hacendado', kcal: 294, protein: 11, fats: 8.0, carbs: 43.0, fiber: 3.6 },
