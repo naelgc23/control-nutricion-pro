@@ -23,12 +23,31 @@ export default function Registro() {
   }))
 
   const handleRegister = () => {
-    if (!selectedFood || !grams || grams <= 0) {
-      setMessage('Por favor selecciona alimento y cantidad')
-      setTimeout(() => setMessage(''), 3000)
+    const errors = []
+
+    // Validar tipo de comida
+    if (!selectedMeal || selectedMeal.trim() === '') {
+      errors.push('Debes seleccionar el tipo de comida')
+    }
+
+    // Validar alimento
+    if (!selectedFood) {
+      errors.push('Debes seleccionar un alimento')
+    }
+
+    // Validar cantidad
+    if (!grams || grams <= 0) {
+      errors.push('Debes introducir la cantidad en gramos')
+    }
+
+    // Si hay errores, mostrar mensaje
+    if (errors.length > 0) {
+      setMessage('❌ ' + errors.join(' | '))
+      setTimeout(() => setMessage(''), 4000)
       return
     }
 
+    // Si todo es válido, registrar
     const food = selectedFood.food
     const consumedGrams = parseFloat(grams)
     const multiplier = consumedGrams / 100
@@ -50,6 +69,7 @@ export default function Registro() {
     setMessage('✅ Registrado correctamente')
     setSelectedFood(null)
     setGrams('')
+    // IMPORTANTE: NO resetear selectedMeal para que se mantenga seleccionado
     setTimeout(() => setMessage(''), 3000)
   }
 
@@ -85,6 +105,12 @@ export default function Registro() {
   return (
     <div className="registro">
       <h2>📝 Registrar Consumo</h2>
+
+      {message && (
+        <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}`}>
+          {message}
+        </div>
+      )}
 
       <div className="form-group">
         <label>Fecha</label>
@@ -128,6 +154,7 @@ export default function Registro() {
           placeholder="Ej: 150"
           min="1"
           step="0.1"
+          onWheel={(e) => e.currentTarget.blur()}
         />
       </div>
 
@@ -152,14 +179,8 @@ export default function Registro() {
       )}
 
       <button onClick={handleRegister} className="btn-primary">
-        Registrar Consumo
+        ✅ Registrar Consumo
       </button>
-
-      {message && (
-        <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}`}>
-          {message}
-        </div>
-      )}
 
       {todayConsumptions.length > 0 && (
         <>

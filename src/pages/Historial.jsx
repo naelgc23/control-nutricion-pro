@@ -17,7 +17,6 @@ function Historial({ consumptions }) {
           protein: 0,
           fats: 0,
           carbs: 0,
-          fiber: 0,
           meals: []
         };
       }
@@ -25,7 +24,6 @@ function Historial({ consumptions }) {
       grouped[c.date].protein += c.protein;
       grouped[c.date].fats += c.fats;
       grouped[c.date].carbs += c.carbs;
-      grouped[c.date].fiber += c.fiber;
       grouped[c.date].meals.push(c);
     });
 
@@ -41,7 +39,6 @@ function Historial({ consumptions }) {
       protein: 0,
       fats: 0,
       carbs: 0,
-      fiber: 0,
       days: dates.length
     };
 
@@ -50,7 +47,6 @@ function Historial({ consumptions }) {
       totals.protein += groupedByDate[date].protein;
       totals.fats += groupedByDate[date].fats;
       totals.carbs += groupedByDate[date].carbs;
-      totals.fiber += groupedByDate[date].fiber;
     });
 
     return {
@@ -143,10 +139,6 @@ function Historial({ consumptions }) {
                     <div className="stat">
                       <span className="label">Hidratos</span>
                       <span className="value">{data.carbs.toFixed(1)}g</span>
-                    </div>
-                    <div className="stat">
-                      <span className="label">Fibra</span>
-                      <span className="value">{data.fiber.toFixed(1)}g</span>
                     </div>
                   </div>
 
