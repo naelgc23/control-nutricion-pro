@@ -18,31 +18,32 @@ export default function Registro() {
   // Convertir alimentos a formato react-select
   const foodOptions = foods.map(food => ({
     value: food.name,
-    label: `${food.name} (${food.kcal} kcal/100g)`,
+    label: `${food.name}`,
     food: food
   }))
 
   const handleRegister = () => {
     const errors = []
+    const gramsValue = Number(grams)
 
     // Validar tipo de comida
     if (!selectedMeal || selectedMeal.trim() === '') {
-      errors.push('Debes seleccionar el tipo de comida')
+      errors.push('tipo de comida')
     }
 
     // Validar alimento
-    if (!selectedFood) {
-      errors.push('Debes seleccionar un alimento')
+    if (!selectedFood || !selectedFood.value) {
+      errors.push('alimento')
     }
 
     // Validar cantidad
-    if (!grams || grams <= 0) {
-      errors.push('Debes introducir la cantidad en gramos')
+    if (!grams || Number.isNaN(gramsValue) || gramsValue <= 0) {
+      errors.push('cantidad en gramos')
     }
 
     // Si hay errores, mostrar mensaje
     if (errors.length > 0) {
-      setMessage('❌ ' + errors.join(' | '))
+      setMessage('❌ Faltan datos: rellena ' + errors.join(', '))
       setTimeout(() => setMessage(''), 4000)
       return
     }
