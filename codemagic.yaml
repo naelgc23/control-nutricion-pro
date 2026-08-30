@@ -3,9 +3,6 @@ workflows:
     name: iOS App Build
     instance_type: mac_mini_m2
     environment:
-      ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: com.nutricionpro.app
       vars:
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
@@ -34,14 +31,14 @@ workflows:
           -derivedDataPath build/ios \
           -sdk iphoneos \
           CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
       - name: Create IPA
         script: |
-          cd build/ios/Build/Products/Release-iphoneos
-          mkdir -p Payload
-          mv App.app Payload/
+          mkdir -p build/Payload
+          cp -r build/ios/Build/Products/Release-iphoneos/App.app build/Payload/
+          cd build
           zip -r -q App.ipa Payload/
-          mv App.ipa ../../../..
-          cd ../../../../..
+          cd ..
     artifacts:
-      - build/ios/App.ipa
+      - build/App.ipa
