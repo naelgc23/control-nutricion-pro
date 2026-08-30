@@ -45,7 +45,3 @@ workflows:
           cd ../../../../..
     artifacts:
       - build/ios/App.ipa
-    publishing:
-      email:
-        recipients:
-          - $CM_BUILD_ID@codemagic.io
