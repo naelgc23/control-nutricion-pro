@@ -1,0 +1,51 @@
+workflows:
+  ios-workflow:
+    name: iOS App Build
+    instance_type: mac_mini_m2
+    environment:
+      ios_signing:
+        distribution_type: ad_hoc
+        bundle_identifier: com.nutricionpro.app
+      vars:
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+        BUNDLE_ID: "com.nutricionpro.app"
+    scripts:
+      - name: Install Node dependencies
+        script: |
+          npm install
+      - name: Build React app
+        script: |
+          npm run build
+      - name: Install CocoaPods
+        script: |
+          sudo gem install cocoapods
+      - name: Update Capacitor iOS
+        script: |
+          npx cap sync ios
+      - name: Install iOS dependencies
+        script: |
+          cd ios/App && pod install && cd ../..
+      - name: Build iOS app
+        script: |
+          xcodebuild build -workspace ios/App/App.xcworkspace \
+          -scheme App \
+          -configuration Release \
+          -derivedDataPath build/ios \
+          -sdk iphoneos \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+      - name: Create IPA
+        script: |
+          cd build/ios/Build/Products/Release-iphoneos
+          mkdir -p Payload
+          mv App.app Payload/
+          zip -r -q App.ipa Payload/
+          mv App.ipa ../../../..
+          cd ../../../../..
+    artifacts:
+      - build/ios/App.ipa
+    publishing:
+      email:
+        recipients:
+          - $CM_BUILD_ID@codemagic.io
