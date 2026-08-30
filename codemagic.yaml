@@ -10,7 +10,10 @@ workflows:
     scripts:
       - name: Install Node dependencies
         script: |
-          npm install
+          npm ci
+      - name: Fix permissions
+        script: |
+          chmod +x node_modules/.bin/*
       - name: Build React app
         script: |
           npm run build
