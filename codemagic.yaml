@@ -18,16 +18,18 @@ workflows:
       - name: Build React app
         script: |
           npm run build
-      - name: Install CocoaPods
+      - name: Prepare Ruby and CocoaPods
         script: |
           ruby -v
-          gem install cocoapods
+          gem install bundler -v 2.5.22 --no-document
+          gem install cocoapods -v 1.15.2 --no-document
+          pod --version
       - name: Update Capacitor iOS
         script: |
           npx cap sync ios
       - name: Install iOS dependencies
         script: |
-          cd ios/App && pod install && cd ../..
+          cd ios/App && pod install --repo-update && cd ../..
       - name: Build iOS app
         script: |
           xcodebuild build -workspace ios/App/App.xcworkspace \
