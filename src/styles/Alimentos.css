@@ -61,6 +61,42 @@
   border-bottom: none;
 }
 
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-edit {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.btn-edit:hover {
+  transform: translateY(-1px);
+  background: #bbf7d0;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-delete:hover {
+  transform: translateY(-1px);
+  background: #fecaca;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;

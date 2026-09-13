@@ -4,8 +4,18 @@ import '../styles/Alimentos.css';
 function Alimentos({ foods, setFoods }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [editingFoodIndex, setEditingFoodIndex] = useState(null);
   const [alert, setAlert] = useState(null);
   const [newFood, setNewFood] = useState({
+    name: '',
+    kcal: '',
+    protein: '',
+    fats: '',
+    carbs: '',
+    fiber: ''
+  });
+
+  const emptyFoodForm = () => ({
     name: '',
     kcal: '',
     protein: '',
@@ -20,14 +30,24 @@ function Alimentos({ foods, setFoods }) {
     );
   }, [foods, searchTerm]);
 
-  const handleAddFood = () => {
+  const resetFoodForm = () => {
+    setNewFood(emptyFoodForm());
+    setEditingFoodIndex(null);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    resetFoodForm();
+  };
+
+  const handleSaveFood = () => {
     if (!newFood.name || !newFood.kcal || !newFood.protein || !newFood.fats || !newFood.carbs) {
       showAlert('Por favor completa todos los campos', 'error');
       return;
     }
 
-    const foodToAdd = {
-      name: newFood.name,
+    const foodToSave = {
+      name: newFood.name.trim(),
       kcal: parseFloat(newFood.kcal),
       protein: parseFloat(newFood.protein),
       fats: parseFloat(newFood.fats),
@@ -35,24 +55,43 @@ function Alimentos({ foods, setFoods }) {
       fiber: parseFloat(newFood.fiber) || 0
     };
 
-    setFoods([...foods, foodToAdd]);
-    setNewFood({
-      name: '',
-      kcal: '',
-      protein: '',
-      fats: '',
-      carbs: '',
-      fiber: ''
-    });
-    setShowModal(false);
-    showAlert('✅ Alimento agregado correctamente', 'success');
+    if (editingFoodIndex !== null) {
+      const updatedFoods = [...foods];
+      updatedFoods[editingFoodIndex] = foodToSave;
+      setFoods(updatedFoods);
+      showAlert('✅ Alimento actualizado correctamente', 'success');
+    } else {
+      setFoods([...foods, foodToSave]);
+      showAlert('✅ Alimento agregado correctamente', 'success');
+    }
+
+    closeModal();
   };
 
   const handleDeleteFood = (index) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este alimento?')) {
-      setFoods(foods.filter((_, i) => i !== index));
+      setFoods(prevFoods => prevFoods.filter((_, i) => i !== index));
       showAlert('✅ Alimento eliminado', 'success');
     }
+  };
+
+  const openAddModal = () => {
+    resetFoodForm();
+    setShowModal(true);
+  };
+
+  const openEditModal = (index) => {
+    const foodToEdit = foods[index];
+    setEditingFoodIndex(index);
+    setNewFood({
+      name: foodToEdit.name,
+      kcal: String(foodToEdit.kcal),
+      protein: String(foodToEdit.protein),
+      fats: String(foodToEdit.fats),
+      carbs: String(foodToEdit.carbs),
+      fiber: String(foodToEdit.fiber ?? 0)
+    });
+    setShowModal(true);
   };
 
   const showAlert = (message, type) => {
@@ -81,7 +120,7 @@ function Alimentos({ foods, setFoods }) {
           />
         </div>
 
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+        <button className="btn btn-primary" onClick={openAddModal}>
           ➕ Agregar Alimento
         </button>
 
@@ -99,24 +138,38 @@ function Alimentos({ foods, setFoods }) {
               </tr>
             </thead>
             <tbody>
-              {filteredFoods.map((food, idx) => (
-                <tr key={idx}>
-                  <td>{food.name}</td>
-                  <td>{food.kcal}</td>
-                  <td>{food.protein}g</td>
-                  <td>{food.fats}g</td>
-                  <td>{food.carbs}g</td>
-                  <td>{food.fiber}g</td>
-                  <td>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDeleteFood(foods.indexOf(food))}
-                    >
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredFoods.map((food) => {
+                const originalIndex = foods.findIndex(item => item === food);
+
+                return (
+                  <tr key={`${food.name}-${originalIndex}`}>
+                    <td>{food.name}</td>
+                    <td>{food.kcal}</td>
+                    <td>{food.protein}g</td>
+                    <td>{food.fats}g</td>
+                    <td>{food.carbs}g</td>
+                    <td>{food.fiber}g</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="btn-edit"
+                          onClick={() => openEditModal(originalIndex)}
+                          title="Editar alimento"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          className="btn-delete"
+                          onClick={() => handleDeleteFood(originalIndex)}
+                          title="Eliminar alimento"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -127,11 +180,11 @@ function Alimentos({ foods, setFoods }) {
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Agregar Alimento</h3>
-              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+              <h3>{editingFoodIndex !== null ? 'Editar Alimento' : 'Agregar Alimento'}</h3>
+              <button className="modal-close" onClick={closeModal}>✕</button>
             </div>
 
             <div className="form-group">
@@ -197,10 +250,10 @@ function Alimentos({ foods, setFoods }) {
             </div>
 
             <div className="modal-actions">
-              <button className="btn btn-primary" onClick={handleAddFood}>
-                Guardar
+              <button className="btn btn-primary" onClick={handleSaveFood}>
+                {editingFoodIndex !== null ? 'Guardar cambios' : 'Guardar'}
               </button>
-              <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+              <button className="btn btn-secondary" onClick={closeModal}>
                 Cancelar
               </button>
             </div>
