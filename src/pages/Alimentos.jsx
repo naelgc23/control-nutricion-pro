@@ -1,9 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import '../styles/Alimentos.css';
 
+const sortLabels = {
+  name: 'Alimento',
+  kcal: 'Kcal/100g',
+  protein: 'Proteína',
+  fats: 'Grasas',
+  carbs: 'Hidratos',
+  fiber: 'Fibra'
+};
+
 function Alimentos({ foods, setFoods }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+  const [macroFilters, setMacroFilters] = useState({
+    kcal: '',
+    protein: '',
+    fats: '',
+    carbs: '',
+    fiber: ''
+  });
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [foodToDelete, setFoodToDelete] = useState(null);
   const [editingFoodIndex, setEditingFoodIndex] = useState(null);
   const [alert, setAlert] = useState(null);
   const [newFood, setNewFood] = useState({
@@ -25,10 +44,40 @@ function Alimentos({ foods, setFoods }) {
   });
 
   const filteredFoods = useMemo(() => {
-    return foods.filter(food =>
-      food.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [foods, searchTerm]);
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    const result = foods.filter(food => {
+      const matchesSearch =
+        normalizedSearch === '' || food.name.toLowerCase().includes(normalizedSearch);
+
+      const matchesKcal = !macroFilters.kcal || Number(food.kcal) <= Number(macroFilters.kcal);
+      const matchesProtein = !macroFilters.protein || Number(food.protein) >= Number(macroFilters.protein);
+      const matchesFats = !macroFilters.fats || Number(food.fats) <= Number(macroFilters.fats);
+      const matchesCarbs = !macroFilters.carbs || Number(food.carbs) >= Number(macroFilters.carbs);
+      const matchesFiber = !macroFilters.fiber || Number(food.fiber) >= Number(macroFilters.fiber);
+
+      return matchesSearch && matchesKcal && matchesProtein && matchesFats && matchesCarbs && matchesFiber;
+    });
+
+    const sortable = [...result];
+    sortable.sort((a, b) => {
+      const valueA = a[sortConfig.key];
+      const valueB = b[sortConfig.key];
+
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return sortConfig.direction === 'asc'
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      }
+
+      const numericA = Number(valueA) || 0;
+      const numericB = Number(valueB) || 0;
+
+      return sortConfig.direction === 'asc' ? numericA - numericB : numericB - numericA;
+    });
+
+    return sortable;
+  }, [foods, searchTerm, sortConfig, macroFilters]);
 
   const resetFoodForm = () => {
     setNewFood(emptyFoodForm());
@@ -40,14 +89,22 @@ function Alimentos({ foods, setFoods }) {
     resetFoodForm();
   };
 
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
   const handleSaveFood = () => {
     if (!newFood.name || !newFood.kcal || !newFood.protein || !newFood.fats || !newFood.carbs) {
       showAlert('Por favor completa todos los campos', 'error');
       return;
     }
 
+    const normalizedName = newFood.name.trim();
     const foodToSave = {
-      name: newFood.name.trim(),
+      name: normalizedName,
       kcal: parseFloat(newFood.kcal),
       protein: parseFloat(newFood.protein),
       fats: parseFloat(newFood.fats),
@@ -55,22 +112,43 @@ function Alimentos({ foods, setFoods }) {
       fiber: parseFloat(newFood.fiber) || 0
     };
 
+    if (Number.isNaN(foodToSave.kcal) || Number.isNaN(foodToSave.protein) || Number.isNaN(foodToSave.fats) || Number.isNaN(foodToSave.carbs)) {
+      showAlert('Los valores nutricionales deben ser números válidos', 'error');
+      return;
+    }
+
+    const isDuplicate = foods.some((food, index) => {
+      const sameName = food.name.toLowerCase() === normalizedName.toLowerCase();
+      return sameName && index !== editingFoodIndex;
+    });
+
+    if (isDuplicate) {
+      showAlert('Ya existe un alimento con ese nombre', 'error');
+      return;
+    }
+
     if (editingFoodIndex !== null) {
-      const updatedFoods = [...foods];
-      updatedFoods[editingFoodIndex] = foodToSave;
-      setFoods(updatedFoods);
+      setFoods(prevFoods => prevFoods.map((food, index) => index === editingFoodIndex ? foodToSave : food));
       showAlert('✅ Alimento actualizado correctamente', 'success');
     } else {
-      setFoods([...foods, foodToSave]);
+      setFoods(prevFoods => [...prevFoods, foodToSave]);
       showAlert('✅ Alimento agregado correctamente', 'success');
     }
 
     closeModal();
   };
 
-  const handleDeleteFood = (index) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este alimento?')) {
-      setFoods(prevFoods => prevFoods.filter((_, i) => i !== index));
+  const confirmDeleteFood = (index) => {
+    const food = foods[index];
+    setFoodToDelete({ index, name: food.name });
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteFood = () => {
+    if (foodToDelete) {
+      setFoods(prevFoods => prevFoods.filter((_, i) => i !== foodToDelete.index));
+      setShowDeleteConfirm(false);
+      setFoodToDelete(null);
       showAlert('✅ Alimento eliminado', 'success');
     }
   };
@@ -99,6 +177,15 @@ function Alimentos({ foods, setFoods }) {
     setTimeout(() => setAlert(null), 3000);
   };
 
+  const handleMacroFilterChange = (field, value) => {
+    setMacroFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setMacroFilters({ kcal: '', protein: '', fats: '', carbs: '', fiber: '' });
+  };
+
   return (
     <div className="alimentos">
       {alert && (
@@ -120,6 +207,32 @@ function Alimentos({ foods, setFoods }) {
           />
         </div>
 
+        <div className="filters-grid">
+          <div className="filter-field">
+            <label>Kcal ≤</label>
+            <input type="number" value={macroFilters.kcal} onChange={(e) => handleMacroFilterChange('kcal', e.target.value)} placeholder="Ej: 250" />
+          </div>
+          <div className="filter-field">
+            <label>Proteína ≥</label>
+            <input type="number" value={macroFilters.protein} onChange={(e) => handleMacroFilterChange('protein', e.target.value)} placeholder="Ej: 15" />
+          </div>
+          <div className="filter-field">
+            <label>Grasas ≤</label>
+            <input type="number" value={macroFilters.fats} onChange={(e) => handleMacroFilterChange('fats', e.target.value)} placeholder="Ej: 10" />
+          </div>
+          <div className="filter-field">
+            <label>Hidratos ≥</label>
+            <input type="number" value={macroFilters.carbs} onChange={(e) => handleMacroFilterChange('carbs', e.target.value)} placeholder="Ej: 5" />
+          </div>
+          <div className="filter-field">
+            <label>Fibra ≥</label>
+            <input type="number" value={macroFilters.fiber} onChange={(e) => handleMacroFilterChange('fiber', e.target.value)} placeholder="Ej: 2" />
+          </div>
+          <button className="btn btn-secondary reset-filters" onClick={resetFilters}>
+            Limpiar filtros
+          </button>
+        </div>
+
         <button className="btn btn-primary" onClick={openAddModal}>
           ➕ Agregar Alimento
         </button>
@@ -128,12 +241,24 @@ function Alimentos({ foods, setFoods }) {
           <table className="foods-table">
             <thead>
               <tr>
-                <th>Alimento</th>
-                <th>Kcal/100g</th>
-                <th>Proteína</th>
-                <th>Grasas</th>
-                <th>Hidratos</th>
-                <th>Fibra</th>
+                <th onClick={() => handleSort('name')} className="sortable-header">
+                  Alimento {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('kcal')} className="sortable-header">
+                  Kcal/100g {sortConfig.key === 'kcal' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('protein')} className="sortable-header">
+                  Proteína {sortConfig.key === 'protein' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('fats')} className="sortable-header">
+                  Grasas {sortConfig.key === 'fats' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('carbs')} className="sortable-header">
+                  Hidratos {sortConfig.key === 'carbs' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
+                <th onClick={() => handleSort('fiber')} className="sortable-header">
+                  Fibra {sortConfig.key === 'fiber' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                </th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -160,7 +285,7 @@ function Alimentos({ foods, setFoods }) {
                         </button>
                         <button
                           className="btn-delete"
-                          onClick={() => handleDeleteFood(originalIndex)}
+                          onClick={() => confirmDeleteFood(originalIndex)}
                           title="Eliminar alimento"
                         >
                           ✕
@@ -175,9 +300,22 @@ function Alimentos({ foods, setFoods }) {
         </div>
 
         {filteredFoods.length === 0 && (
-          <p className="empty-message">No se encontraron alimentos</p>
+          <p className="empty-message">No se encontraron alimentos con ese filtro o búsqueda</p>
         )}
       </div>
+
+      {showDeleteConfirm && foodToDelete && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>¿Eliminar alimento?</h3>
+            <p>Se eliminará <strong>{foodToDelete.name}</strong> de la base de datos.</p>
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={handleDeleteFood}>Confirmar</button>
+              <button className="btn btn-secondary" onClick={() => setShowDeleteConfirm(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
