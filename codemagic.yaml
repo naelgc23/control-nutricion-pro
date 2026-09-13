@@ -3,6 +3,7 @@ workflows:
     name: iOS App Build
     instance_type: mac_mini_m2
     environment:
+      ruby: 3.2.2
       vars:
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
@@ -19,7 +20,8 @@ workflows:
           npm run build
       - name: Install CocoaPods
         script: |
-          sudo gem install cocoapods
+          ruby -v
+          gem install cocoapods
       - name: Update Capacitor iOS
         script: |
           npx cap sync ios
