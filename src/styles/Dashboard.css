@@ -85,6 +85,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
+  table-layout: fixed;
 }
 
 .meals-table thead {
@@ -92,16 +93,42 @@
 }
 
 .meals-table th {
-  padding: 12px;
+  padding: 8px 6px;
   text-align: left;
   font-weight: 600;
   border-bottom: 2px solid #e2e8f0;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
+  color: #2d3748;
 }
 
 .meals-table td {
-  padding: 12px;
+  padding: 8px 6px;
   border-bottom: 1px solid #e2e8f0;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meals-table th:nth-child(1),
+.meals-table td:nth-child(1) {
+  width: 30%;
+}
+
+.meals-table th:nth-child(2),
+.meals-table td:nth-child(2) {
+  width: 12%;
+}
+
+.meals-table th:nth-child(3),
+.meals-table td:nth-child(3),
+.meals-table th:nth-child(4),
+.meals-table td:nth-child(4),
+.meals-table th:nth-child(5),
+.meals-table td:nth-child(5),
+.meals-table th:nth-child(6),
+.meals-table td:nth-child(6) {
+  width: 14%;
 }
 
 .meals-table tbody tr:hover {

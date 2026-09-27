@@ -154,7 +154,33 @@
 .meals-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  table-layout: fixed;
+}
+
+.compact-table {
+  table-layout: fixed;
+}
+
+.compact-table th:nth-child(1),
+.compact-table td:nth-child(1) {
+  width: 30%;
+}
+
+.compact-table th:nth-child(2),
+.compact-table td:nth-child(2) {
+  width: 12%;
+}
+
+.compact-table th:nth-child(3),
+.compact-table td:nth-child(3),
+.compact-table th:nth-child(4),
+.compact-table td:nth-child(4),
+.compact-table th:nth-child(5),
+.compact-table td:nth-child(5),
+.compact-table th:nth-child(6),
+.compact-table td:nth-child(6) {
+  width: 14%;
 }
 
 .meals-table thead {
@@ -162,16 +188,26 @@
 }
 
 .meals-table th {
-  padding: 10px;
+  padding: 8px 6px;
   text-align: left;
   font-weight: 600;
   color: #2d3748;
   border: none;
+  font-size: 0.7rem;
 }
 
 .meals-table td {
-  padding: 8px 10px;
+  padding: 7px 6px;
   border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compact-table td:first-child {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 .meals-table tbody tr:hover {
@@ -245,12 +281,12 @@
   }
 
   .meals-table {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 
   .meals-table th,
   .meals-table td {
-    padding: 6px;
+    padding: 5px 4px;
   }
 }
 

@@ -17,6 +17,7 @@ function Historial({ consumptions }) {
           protein: 0,
           fats: 0,
           carbs: 0,
+          fiber: 0,
           meals: []
         };
       }
@@ -24,6 +25,7 @@ function Historial({ consumptions }) {
       grouped[c.date].protein += c.protein;
       grouped[c.date].fats += c.fats;
       grouped[c.date].carbs += c.carbs;
+      grouped[c.date].fiber += c.fiber || 0;
       grouped[c.date].meals.push(c);
     });
 
@@ -39,6 +41,7 @@ function Historial({ consumptions }) {
       protein: 0,
       fats: 0,
       carbs: 0,
+      fiber: 0,
       days: dates.length
     };
 
@@ -47,6 +50,7 @@ function Historial({ consumptions }) {
       totals.protein += groupedByDate[date].protein;
       totals.fats += groupedByDate[date].fats;
       totals.carbs += groupedByDate[date].carbs;
+      totals.fiber += groupedByDate[date].fiber;
     });
 
     return {
@@ -54,7 +58,8 @@ function Historial({ consumptions }) {
       avgKcal: Math.round(totals.kcal / totals.days),
       avgProtein: (totals.protein / totals.days).toFixed(1),
       avgFats: (totals.fats / totals.days).toFixed(1),
-      avgCarbs: (totals.carbs / totals.days).toFixed(1)
+      avgCarbs: (totals.carbs / totals.days).toFixed(1),
+      avgFiber: (totals.fiber / totals.days).toFixed(1)
     };
   }, [groupedByDate]);
 
@@ -98,6 +103,10 @@ function Historial({ consumptions }) {
             <div className="stat-label">🌾 Promedio Hidratos</div>
             <div className="stat-value">{stats.avgCarbs}g</div>
           </div>
+          <div className="stat-box">
+            <div className="stat-label">🌿 Promedio Fibra</div>
+            <div className="stat-value">{stats.avgFiber}g</div>
+          </div>
         </div>
       )}
 
@@ -140,32 +149,56 @@ function Historial({ consumptions }) {
                       <span className="label">Hidratos</span>
                       <span className="value">{data.carbs.toFixed(1)}g</span>
                     </div>
+                    <div className="stat">
+                      <span className="label">Fibra</span>
+                      <span className="value">{(data.fiber || 0).toFixed(1)}g</span>
+                    </div>
                   </div>
 
                   <details className="meals-detail">
                     <summary>Ver detalles</summary>
-                    <table className="meals-table">
+                    <table className="meals-table compact-table">
                       <thead>
                         <tr>
                           <th>Comida</th>
-                          <th>Alimento</th>
-                          <th>Grs</th>
                           <th>Kcal</th>
-                          <th>P</th>
-                          <th>G</th>
-                          <th>HC</th>
+                          <th>Pro</th>
+                          <th>Gra</th>
+                          <th>Hid</th>
+                          <th>Fib</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {data.meals.map((meal, idx) => (
-                          <tr key={idx}>
-                            <td>{meal.meal}</td>
-                            <td>{meal.foodName}</td>
-                            <td>{meal.grams}</td>
-                            <td>{meal.kcal}</td>
-                            <td>{meal.protein.toFixed(1)}</td>
-                            <td>{meal.fats.toFixed(1)}</td>
-                            <td>{meal.carbs.toFixed(1)}</td>
+                        {Object.entries(
+                          data.meals.reduce((acc, meal) => {
+                            if (!acc[meal.meal]) {
+                              acc[meal.meal] = {
+                                kcal: 0,
+                                protein: 0,
+                                fats: 0,
+                                carbs: 0,
+                                fiber: 0,
+                                count: 0
+                              };
+                            }
+
+                            acc[meal.meal].kcal += meal.kcal;
+                            acc[meal.meal].protein += meal.protein;
+                            acc[meal.meal].fats += meal.fats;
+                            acc[meal.meal].carbs += meal.carbs;
+                            acc[meal.meal].fiber += meal.fiber || 0;
+                            acc[meal.meal].count += 1;
+
+                            return acc;
+                          }, {})
+                        ).map(([mealName, totals]) => (
+                          <tr key={mealName}>
+                            <td>{mealName}</td>
+                            <td>{totals.kcal}</td>
+                            <td>{totals.protein.toFixed(1)}g</td>
+                            <td>{totals.fats.toFixed(1)}g</td>
+                            <td>{totals.carbs.toFixed(1)}g</td>
+                            <td>{(totals.fiber || 0).toFixed(1)}g</td>
                           </tr>
                         ))}
                       </tbody>

@@ -66,6 +66,16 @@ function Objetivos({ goals, setGoals }) {
             />
             <small>gramos/día</small>
           </div>
+
+          <div className="form-group">
+            <label>🌿 Fibra</label>
+            <input
+              type="number"
+              value={formGoals.fiber ?? 30}
+              onChange={(e) => setFormGoals({ ...formGoals, fiber: parseInt(e.target.value) })}
+            />
+            <small>gramos/día</small>
+          </div>
         </div>
 
         <button className="btn btn-primary" onClick={handleSave}>

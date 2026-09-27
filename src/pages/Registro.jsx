@@ -1,12 +1,8 @@
 import React, { useState } from 'react'
 import Select from 'react-select'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { getDefaultFoods } from '../App'
 import '../styles/Registro.css'
 
-export default function Registro() {
-  const [foods] = useLocalStorage('foods', getDefaultFoods())
-  const [consumptions, setConsumptions] = useLocalStorage('consumptions', [])
+export default function Registro({ foods, consumptions, setConsumptions }) {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [selectedMeal, setSelectedMeal] = useState('')
   const [selectedFood, setSelectedFood] = useState(null)
@@ -66,7 +62,7 @@ export default function Registro() {
       fiber: Math.round(food.fiber * multiplier * 10) / 10
     }
 
-    setConsumptions([...consumptions, newConsumption])
+    setConsumptions(prevConsumptions => [...prevConsumptions, newConsumption])
     setMessage('✅ Registrado correctamente')
     setSelectedFood(null)
     setGrams('')
@@ -125,7 +121,7 @@ export default function Registro() {
       <div className="form-group">
         <label>Tipo de Comida</label>
         <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
-          <option value="">-- Selecciona comida --</option>
+          <option value="">Selecciona comida</option>
           {mealTypes.map(meal => (
             <option key={meal} value={meal}>{meal}</option>
           ))}
@@ -175,6 +171,9 @@ export default function Registro() {
             <div>
               <strong>{Math.round(selectedFoodData.carbs * (grams / 100) * 10) / 10}</strong> g carbs
             </div>
+            <div>
+              <strong>{Math.round((selectedFoodData.fiber || 0) * (grams / 100) * 10) / 10}</strong> g fibra
+            </div>
           </div>
         </div>
       )}
@@ -190,30 +189,33 @@ export default function Registro() {
             <table className="consumptions-table">
               <thead>
                 <tr>
-                  <th>Comida</th>
-                  <th>Alimento</th>
-                  <th>Cantidad</th>
+                  <th>Com</th>
+                  <th>Alim</th>
+                  <th>Grs</th>
                   <th>Kcal</th>
                   <th>P</th>
                   <th>G</th>
                   <th>C</th>
-                  <th>Acción</th>
+                  <th>Fib</th>
+                  <th>X</th>
                 </tr>
               </thead>
               <tbody>
                 {todayConsumptions.map(consumption => (
                   <tr key={consumption.id}>
-                    <td>{consumption.meal}</td>
-                    <td>{consumption.foodName}</td>
+                    <td className="meal-cell">{consumption.meal}</td>
+                    <td className="food-name-cell">{consumption.foodName}</td>
                     <td>{consumption.grams}g</td>
                     <td>{consumption.kcal}</td>
                     <td>{consumption.protein}g</td>
                     <td>{consumption.fats}g</td>
                     <td>{consumption.carbs}g</td>
+                    <td>{(consumption.fiber || 0).toFixed(1)}g</td>
                     <td>
                       <button
-                        onClick={() => setConsumptions(consumptions.filter(c => c.id !== consumption.id))}
+                        onClick={() => setConsumptions(prevConsumptions => prevConsumptions.filter(c => c.id !== consumption.id))}
                         className="btn-delete"
+                        aria-label="Eliminar registro"
                       >
                         🗑️
                       </button>

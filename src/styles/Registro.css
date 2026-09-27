@@ -76,6 +76,69 @@
   margin-top: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  -webkit-overflow-scrolling: touch;
+}
+
+.consumptions-table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  table-layout: fixed;
+}
+
+.consumptions-table th,
+.consumptions-table td {
+  padding: 6px 4px;
+  text-align: left;
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.consumptions-table th {
+  font-size: 0.7rem;
+}
+
+.meal-cell,
+.food-name-cell {
+  white-space: normal;
+  line-height: 1.15;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.food-name-cell {
+  overflow-wrap: anywhere;
+}
+
+.nutrient-info {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.nutrient-info p {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.nutrient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  font-size: 0.96rem;
+}
+
+.nutrient-grid div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* BOTÓN PRINCIPAL - MEJORADO */
@@ -133,6 +196,41 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* ANIMACIONES */
+@media (max-width: 480px) {
+  .registro {
+    font-size: 0.94rem;
+  }
+
+  .registro h2,
+  .registro h3 {
+    font-size: 1.1rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .nutrient-grid {
+    grid-template-columns: 1fr;
+    font-size: 0.9rem;
+  }
+
+  .consumptions-table {
+    min-width: 380px;
+    font-size: 0.68rem;
+  }
+
+  .consumptions-table th,
+  .consumptions-table td {
+    padding: 5px 3px;
+  }
+
+  .btn-delete {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

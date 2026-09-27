@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import packageJson from '../package.json';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import Dashboard from './pages/Dashboard';
 import Registro from './pages/Registro';
@@ -7,16 +8,25 @@ import Objetivos from './pages/Objetivos';
 import Historial from './pages/Historial';
 import './App.css';
 
+const APP_VERSION = packageJson.version || 'dev';
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [foods, setFoods] = useLocalStorage('foods', getDefaultFoods());
   const [consumptions, setConsumptions] = useLocalStorage('consumptions', []);
-  const [goals, setGoals] = useLocalStorage('goals', {
-    calories: 2200,
-    protein: 220,
-    fats: 65,
-    carbs: 165
-  });
+  const [goals, setGoals] = useLocalStorage('goals', getDefaultGoals());
+
+  useEffect(() => {
+    const normalizedGoals = {
+      ...getDefaultGoals(),
+      ...goals,
+      fiber: Number(goals?.fiber ?? getDefaultGoals().fiber)
+    };
+
+    if (JSON.stringify(goals ?? {}) !== JSON.stringify(normalizedGoals)) {
+      setGoals(normalizedGoals);
+    }
+  }, [goals, setGoals]);
 
   const tabs = [
     { id: 'dashboard', label: '📊 Dashboard', component: Dashboard },
@@ -34,6 +44,7 @@ function App() {
       <header className="app-header">
         <h1>🥗 Control Nutrición Pro</h1>
         <p>Controla tus macronutrientes de forma fácil</p>
+        <div className="app-version">v{APP_VERSION}</div>
       </header>
 
       <div className="tabs">
@@ -62,6 +73,16 @@ function App() {
       </div>
     </div>
   );
+}
+
+export function getDefaultGoals() {
+  return {
+    calories: 2200,
+    protein: 220,
+    fats: 65,
+    carbs: 165,
+    fiber: 30
+  };
 }
 
 export function getDefaultFoods() {

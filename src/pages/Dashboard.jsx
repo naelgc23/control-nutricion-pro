@@ -14,7 +14,7 @@ function Dashboard({ consumptions, goals }) {
       protein: todayConsumptions.reduce((sum, c) => sum + c.protein, 0),
       fats: todayConsumptions.reduce((sum, c) => sum + c.fats, 0),
       carbs: todayConsumptions.reduce((sum, c) => sum + c.carbs, 0),
-      fiber: todayConsumptions.reduce((sum, c) => sum + c.fiber, 0)
+      fiber: todayConsumptions.reduce((sum, c) => sum + (c.fiber || 0), 0)
     };
   }, [todayConsumptions]);
 
@@ -22,12 +22,13 @@ function Dashboard({ consumptions, goals }) {
     const meals = {};
     todayConsumptions.forEach(c => {
       if (!meals[c.meal]) {
-        meals[c.meal] = { kcal: 0, protein: 0, fats: 0, carbs: 0 };
+        meals[c.meal] = { kcal: 0, protein: 0, fats: 0, carbs: 0, fiber: 0 };
       }
       meals[c.meal].kcal += c.kcal;
       meals[c.meal].protein += c.protein;
       meals[c.meal].fats += c.fats;
       meals[c.meal].carbs += c.carbs;
+      meals[c.meal].fiber += c.fiber || 0;
     });
     return meals;
   };
@@ -92,6 +93,15 @@ function Dashboard({ consumptions, goals }) {
           </div>
           <ProgressBar value={totals.carbs} goal={goals.carbs} />
         </div>
+
+        <div className="stat-card">
+          <div className="stat-label">🌿 Fibra</div>
+          <div className="stat-value">{totals.fiber.toFixed(1)} / {goals.fiber}g</div>
+          <div className="stat-diff">
+            {totals.fiber - goals.fiber > 0 ? '+' : ''}{(totals.fiber - goals.fiber).toFixed(1)}g
+          </div>
+          <ProgressBar value={totals.fiber} goal={goals.fiber} />
+        </div>
       </div>
 
       <div className="card">
@@ -102,9 +112,10 @@ function Dashboard({ consumptions, goals }) {
               <tr>
                 <th>Comida</th>
                 <th>Kcal</th>
-                <th>Proteína</th>
-                <th>Grasas</th>
-                <th>Hidratos</th>
+                <th>Pro</th>
+                <th>Gra</th>
+                <th>Hid</th>
+                <th>Fib</th>
               </tr>
             </thead>
             <tbody>
@@ -115,6 +126,7 @@ function Dashboard({ consumptions, goals }) {
                   <td>{totals.protein.toFixed(1)}g</td>
                   <td>{totals.fats.toFixed(1)}g</td>
                   <td>{totals.carbs.toFixed(1)}g</td>
+                  <td>{(totals.fiber || 0).toFixed(1)}g</td>
                 </tr>
               ))}
             </tbody>
