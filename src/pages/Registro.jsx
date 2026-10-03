@@ -3,13 +3,39 @@ import Select from 'react-select'
 import '../styles/Registro.css'
 
 export default function Registro({ foods, consumptions, setConsumptions }) {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const currentDate = new Date()
+  const selectedDate = [
+    currentDate.getFullYear(),
+    String(currentDate.getMonth() + 1).padStart(2, '0'),
+    String(currentDate.getDate()).padStart(2, '0')
+  ].join('-')
+  const displayDate = currentDate.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
   const [selectedMeal, setSelectedMeal] = useState('')
   const [selectedFood, setSelectedFood] = useState(null)
   const [grams, setGrams] = useState('')
+  const [customMealName, setCustomMealName] = useState('')
+  const [customMacros, setCustomMacros] = useState({
+    kcal: '',
+    protein: '',
+    fats: '',
+    carbs: '',
+    fiber: ''
+  })
   const [message, setMessage] = useState('')
 
-  const mealTypes = ['Desayuno', 'Media mañana', 'Comida', 'Merienda', 'Cena', 'Snack']
+  const mealTypes = ['Desayuno', 'Media mañana', 'Comida', 'Merienda', 'Cena', 'Snack', 'Plato libre']
+  const isCustomMeal = selectedMeal === 'Plato libre'
+  const customMacroFields = [
+    { key: 'kcal', label: 'Kcal', step: '1' },
+    { key: 'protein', label: 'Proteína (g)', step: '0.1' },
+    { key: 'fats', label: 'Grasas (g)', step: '0.1' },
+    { key: 'carbs', label: 'Hidratos (g)', step: '0.1' },
+    { key: 'fiber', label: 'Fibra (g)', step: '0.1' }
+  ]
 
   // Convertir alimentos a formato react-select
   const foodOptions = foods.map(food => ({
@@ -20,21 +46,33 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
 
   const handleRegister = () => {
     const errors = []
-    const gramsValue = Number(grams)
 
     // Validar tipo de comida
     if (!selectedMeal || selectedMeal.trim() === '') {
       errors.push('tipo de comida')
     }
 
-    // Validar alimento
-    if (!selectedFood || !selectedFood.value) {
-      errors.push('alimento')
-    }
+    if (isCustomMeal) {
+      if (!customMealName.trim()) {
+        errors.push('nombre del plato')
+      }
 
-    // Validar cantidad
-    if (!grams || Number.isNaN(gramsValue) || gramsValue <= 0) {
-      errors.push('cantidad en gramos')
+      customMacroFields.forEach(({ key, label }) => {
+        const value = customMacros[key]
+        if (value === '' || !Number.isFinite(Number(value)) || Number(value) < 0) {
+          errors.push(label)
+        }
+      })
+    } else {
+      // Validar alimento y cantidad
+      if (!selectedFood || !selectedFood.value) {
+        errors.push('alimento')
+      }
+
+      const gramsValue = Number(grams)
+      if (!grams || Number.isNaN(gramsValue) || gramsValue <= 0) {
+        errors.push('cantidad en gramos')
+      }
     }
 
     // Si hay errores, mostrar mensaje
@@ -44,28 +82,41 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
       return
     }
 
-    // Si todo es válido, registrar
-    const food = selectedFood.food
-    const consumedGrams = parseFloat(grams)
-    const multiplier = consumedGrams / 100
+    let newConsumption
+    if (isCustomMeal) {
+      newConsumption = {
+        id: Date.now(),
+        date: selectedDate,
+        meal: selectedMeal,
+        foodName: customMealName.trim(),
+        grams: null,
+        ...Object.fromEntries(customMacroFields.map(({ key }) => [key, Number(customMacros[key])]))
+      }
+    } else {
+      const food = selectedFood.food
+      const consumedGrams = parseFloat(grams)
+      const multiplier = consumedGrams / 100
 
-    const newConsumption = {
-      id: Date.now(),
-      date: selectedDate,
-      meal: selectedMeal,
-      foodName: food.name,
-      grams: consumedGrams,
-      kcal: Math.round(food.kcal * multiplier),
-      protein: Math.round(food.protein * multiplier * 10) / 10,
-      fats: Math.round(food.fats * multiplier * 10) / 10,
-      carbs: Math.round(food.carbs * multiplier * 10) / 10,
-      fiber: Math.round(food.fiber * multiplier * 10) / 10
+      newConsumption = {
+        id: Date.now(),
+        date: selectedDate,
+        meal: selectedMeal,
+        foodName: food.name,
+        grams: consumedGrams,
+        kcal: Math.round(food.kcal * multiplier),
+        protein: Math.round(food.protein * multiplier * 10) / 10,
+        fats: Math.round(food.fats * multiplier * 10) / 10,
+        carbs: Math.round(food.carbs * multiplier * 10) / 10,
+        fiber: Math.round(food.fiber * multiplier * 10) / 10
+      }
     }
 
     setConsumptions(prevConsumptions => [...prevConsumptions, newConsumption])
     setMessage('✅ Registrado correctamente')
     setSelectedFood(null)
     setGrams('')
+    setCustomMealName('')
+    setCustomMacros({ kcal: '', protein: '', fats: '', carbs: '', fiber: '' })
     // IMPORTANTE: NO resetear selectedMeal para que se mantenga seleccionado
     setTimeout(() => setMessage(''), 3000)
   }
@@ -109,13 +160,10 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
         </div>
       )}
 
-      <div className="form-group">
-        <label>Fecha</label>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
+      <div className="form-group date-form-group">
+        <div className="current-date-display" aria-label={`Fecha actual: ${displayDate}`}>
+          {displayDate}
+        </div>
       </div>
 
       <div className="form-group">
@@ -123,37 +171,71 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
         <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
           <option value="">Selecciona comida</option>
           {mealTypes.map(meal => (
-            <option key={meal} value={meal}>{meal}</option>
+            <option key={meal} value={meal}>
+              {meal === 'Plato libre' ? 'Plato libre' : meal}
+            </option>
           ))}
         </select>
       </div>
 
-      <div className="form-group">
-        <label>🔍 Buscar Alimento</label>
-        <Select
-          options={foodOptions}
-          value={selectedFood}
-          onChange={setSelectedFood}
-          placeholder="Escribe para buscar alimento..."
-          isClearable
-          isSearchable
-          styles={customStyles}
-          noOptionsMessage={() => 'Alimento no encontrado'}
-        />
-      </div>
+      {isCustomMeal ? (
+        <div className="custom-meal-fields">
+          <div className="form-group">
+            <label htmlFor="custom-meal-name">Nombre del plato</label>
+            <input
+              id="custom-meal-name"
+              type="text"
+              value={customMealName}
+              onChange={(e) => setCustomMealName(e.target.value)}
+              placeholder="Ej: Paella casera"
+              maxLength="60"
+            />
+          </div>
+          {customMacroFields.map(({ key, label, step }) => (
+            <div className="form-group" key={key}>
+              <label htmlFor={`custom-${key}`}>{label}</label>
+              <input
+                id={`custom-${key}`}
+                type="number"
+                value={customMacros[key]}
+                onChange={(e) => setCustomMacros(prev => ({ ...prev, [key]: e.target.value }))}
+                min="0"
+                step={step}
+                onWheel={(e) => e.currentTarget.blur()}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="form-group">
+            <label>🔍 Buscar Alimento</label>
+            <Select
+              options={foodOptions}
+              value={selectedFood}
+              onChange={setSelectedFood}
+              placeholder="Escribe para buscar alimento..."
+              isClearable
+              isSearchable
+              styles={customStyles}
+              noOptionsMessage={() => 'Alimento no encontrado'}
+            />
+          </div>
 
-      <div className="form-group">
-        <label>Cantidad (gramos)</label>
-        <input
-          type="number"
-          value={grams}
-          onChange={(e) => setGrams(e.target.value)}
-          placeholder="Ej: 150"
-          min="1"
-          step="0.1"
-          onWheel={(e) => e.currentTarget.blur()}
-        />
-      </div>
+          <div className="form-group">
+            <label>Cantidad (gramos)</label>
+            <input
+              type="number"
+              value={grams}
+              onChange={(e) => setGrams(e.target.value)}
+              placeholder="Ej: 150"
+              min="1"
+              step="0.1"
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+          </div>
+        </>
+      )}
 
       {selectedFoodData && grams && (
         <div className="nutrient-info">
@@ -205,7 +287,7 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
                   <tr key={consumption.id}>
                     <td className="meal-cell">{consumption.meal}</td>
                     <td className="food-name-cell">{consumption.foodName}</td>
-                    <td>{consumption.grams}g</td>
+                    <td>{consumption.grams == null ? '—' : `${consumption.grams}g`}</td>
                     <td>{consumption.kcal}</td>
                     <td>{consumption.protein}g</td>
                     <td>{consumption.fats}g</td>

@@ -182,9 +182,10 @@ function Alimentos({ foods, setFoods }) {
   };
 
   const resetFilters = () => {
-    setSearchTerm('');
     setMacroFilters({ kcal: '', protein: '', fats: '', carbs: '', fiber: '' });
   };
+
+  const activeMacroFilterCount = Object.values(macroFilters).filter(value => value !== '').length;
 
   return (
     <div className="alimentos">
@@ -195,7 +196,12 @@ function Alimentos({ foods, setFoods }) {
       )}
 
       <div className="card">
-        <h2>🍎 Base de Datos de Alimentos ({foods.length} alimentos)</h2>
+        <div className="foods-header">
+          <h2>🍎 Base de Datos de Alimentos ({foods.length} alimentos)</h2>
+          <button className="btn btn-primary" onClick={openAddModal}>
+            ➕ Agregar Alimento
+          </button>
+        </div>
 
         <div className="search-container">
           <input
@@ -207,35 +213,45 @@ function Alimentos({ foods, setFoods }) {
           />
         </div>
 
-        <div className="filters-grid">
-          <div className="filter-field">
-            <label>Kcal ≤</label>
-            <input type="number" value={macroFilters.kcal} onChange={(e) => handleMacroFilterChange('kcal', e.target.value)} placeholder="Ej: 250" />
+        <details className="filters-panel">
+          <summary className="filters-summary">
+            <span>Filtrar alimentos</span>
+            {activeMacroFilterCount > 0 && (
+              <span className="filter-count">{activeMacroFilterCount} activos</span>
+            )}
+          </summary>
+          <div className="filters-content">
+            <div className="filters-grid">
+              <div className="filter-field">
+                <label>Kcal ≤</label>
+                <input type="number" value={macroFilters.kcal} onChange={(e) => handleMacroFilterChange('kcal', e.target.value)} placeholder="Ej: 250" />
+              </div>
+              <div className="filter-field">
+                <label>Proteína ≥</label>
+                <input type="number" value={macroFilters.protein} onChange={(e) => handleMacroFilterChange('protein', e.target.value)} placeholder="Ej: 15" />
+              </div>
+              <div className="filter-field">
+                <label>Grasas ≤</label>
+                <input type="number" value={macroFilters.fats} onChange={(e) => handleMacroFilterChange('fats', e.target.value)} placeholder="Ej: 10" />
+              </div>
+              <div className="filter-field">
+                <label>Hidratos ≥</label>
+                <input type="number" value={macroFilters.carbs} onChange={(e) => handleMacroFilterChange('carbs', e.target.value)} placeholder="Ej: 5" />
+              </div>
+              <div className="filter-field">
+                <label>Fibra ≥</label>
+                <input type="number" value={macroFilters.fiber} onChange={(e) => handleMacroFilterChange('fiber', e.target.value)} placeholder="Ej: 2" />
+              </div>
+              {activeMacroFilterCount > 0 && (
+                <button className="btn btn-secondary reset-filters" onClick={resetFilters}>
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
           </div>
-          <div className="filter-field">
-            <label>Proteína ≥</label>
-            <input type="number" value={macroFilters.protein} onChange={(e) => handleMacroFilterChange('protein', e.target.value)} placeholder="Ej: 15" />
-          </div>
-          <div className="filter-field">
-            <label>Grasas ≤</label>
-            <input type="number" value={macroFilters.fats} onChange={(e) => handleMacroFilterChange('fats', e.target.value)} placeholder="Ej: 10" />
-          </div>
-          <div className="filter-field">
-            <label>Hidratos ≥</label>
-            <input type="number" value={macroFilters.carbs} onChange={(e) => handleMacroFilterChange('carbs', e.target.value)} placeholder="Ej: 5" />
-          </div>
-          <div className="filter-field">
-            <label>Fibra ≥</label>
-            <input type="number" value={macroFilters.fiber} onChange={(e) => handleMacroFilterChange('fiber', e.target.value)} placeholder="Ej: 2" />
-          </div>
-          <button className="btn btn-secondary reset-filters" onClick={resetFilters}>
-            Limpiar filtros
-          </button>
-        </div>
+        </details>
 
-        <button className="btn btn-primary" onClick={openAddModal}>
-          ➕ Agregar Alimento
-        </button>
+        <p className="nutrition-reference">Valores nutricionales por 100 g</p>
 
         <div className="table-container">
           <table className="foods-table">
@@ -245,7 +261,7 @@ function Alimentos({ foods, setFoods }) {
                   Alimento {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('kcal')} className="sortable-header">
-                  Kcal/100g {sortConfig.key === 'kcal' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Kcal {sortConfig.key === 'kcal' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('protein')} className="sortable-header">
                   Proteína {sortConfig.key === 'protein' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}

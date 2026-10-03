@@ -2,11 +2,17 @@
   animation: fadeIn 0.3s ease;
 }
 
+.history-filter-card h2 {
+  text-align: center;
+}
+
 .filter-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   margin-top: 15px;
+  text-align: center;
 }
 
 .filter-container label {
@@ -14,16 +20,33 @@
   color: #2d3748;
 }
 
-.month-input {
-  padding: 8px 12px;
+.month-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.month-picker select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 8px 10px;
   border: 2px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: white;
+  color: #2d3748;
   font-size: 1rem;
   cursor: pointer;
   transition: border-color 0.3s;
+  text-align: center;
+  text-align-last: center;
 }
 
-.month-input:focus {
+.month-picker select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -98,6 +121,60 @@
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.day-tracking {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tracking-stat {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tracking-stat:first-child {
+  grid-column: 2;
+}
+
+.tracking-stat:last-child {
+  grid-column: 3;
+}
+
+.tracking-stat input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #667eea;
+}
+
+.burned-calories-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px dashed #a0aec0;
+  border-radius: 4px;
+  background: white;
+  text-align: center;
+}
+
+.burned-calories-input:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.burned-calories-input::placeholder {
+  color: #a0aec0;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
@@ -210,6 +287,92 @@
   line-height: 1.25;
 }
 
+.manual-entry-row-label {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.manual-entry-row-label span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.manual-entry-delete {
+  flex: 0 0 auto;
+  padding: 1px;
+  border: 0;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.manual-entry-delete:focus-visible {
+  outline: 2px solid #b91c1c;
+  outline-offset: 2px;
+}
+
+.manual-entry-toggle {
+  margin: 8px 6px 12px;
+  padding: 8px 10px;
+  border: 1px solid #667eea;
+  border-radius: 6px;
+  background: white;
+  color: #667eea;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manual-entry-form {
+  padding: 12px;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+}
+
+.manual-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.manual-entry-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  color: #4a5568;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.manual-entry-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.manual-entry-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.manual-entry-actions button {
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .meals-table tbody tr:hover {
   background: #f0f4ff;
 }
@@ -268,6 +431,18 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+  .day-tracking {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tracking-stat:first-child {
+    grid-column: 1;
+  }
+
+  .tracking-stat:last-child {
+    grid-column: 2;
+  }
+
   .stat {
     padding: 10px;
   }
@@ -306,6 +481,16 @@
     gap: 8px;
   }
 
+  .day-tracking {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .tracking-stat:first-child,
+  .tracking-stat:last-child {
+    grid-column: auto;
+  }
+
   .stat {
     padding: 8px;
   }
@@ -322,13 +507,4 @@
     padding: 10px;
   }
 
-  .filter-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .month-input {
-    width: 100%;
-  }
 }

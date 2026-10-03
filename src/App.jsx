@@ -15,6 +15,7 @@ function App() {
   const [foods, setFoods] = useLocalStorage('foods', getDefaultFoods());
   const [consumptions, setConsumptions] = useLocalStorage('consumptions', []);
   const [goals, setGoals] = useLocalStorage('goals', getDefaultGoals());
+  const [dailyRecords, setDailyRecords] = useLocalStorage('dailyRecords', {});
 
   useEffect(() => {
     const normalizedGoals = {
@@ -66,6 +67,8 @@ function App() {
             setFoods={setFoods}
             consumptions={consumptions}
             setConsumptions={setConsumptions}
+            dailyRecords={dailyRecords}
+            setDailyRecords={setDailyRecords}
             goals={goals}
             setGoals={setGoals}
           />
