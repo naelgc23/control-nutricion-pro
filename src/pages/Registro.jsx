@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Select from 'react-select'
+import { Trash2 } from 'lucide-react'
 import '../styles/Registro.css'
 
 export default function Registro({ foods, consumptions, setConsumptions }) {
@@ -26,6 +27,7 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
     fiber: ''
   })
   const [message, setMessage] = useState('')
+  const [validationErrors, setValidationErrors] = useState([])
 
   const mealTypes = ['Desayuno', 'Media mañana', 'Comida', 'Merienda', 'Cena', 'Snack', 'Plato libre']
   const isCustomMeal = selectedMeal === 'Plato libre'
@@ -77,11 +79,13 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
 
     // Si hay errores, mostrar mensaje
     if (errors.length > 0) {
-      setMessage('❌ Faltan datos: rellena ' + errors.join(', '))
+      setValidationErrors(errors)
+      setMessage('Faltan datos: rellena ' + errors.join(', '))
       setTimeout(() => setMessage(''), 4000)
       return
     }
 
+    setValidationErrors([])
     let newConsumption
     if (isCustomMeal) {
       newConsumption = {
@@ -112,7 +116,7 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
     }
 
     setConsumptions(prevConsumptions => [...prevConsumptions, newConsumption])
-    setMessage('✅ Registrado correctamente')
+    setMessage('Registrado correctamente')
     setSelectedFood(null)
     setGrams('')
     setCustomMealName('')
@@ -121,30 +125,69 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
     setTimeout(() => setMessage(''), 3000)
   }
 
+  const clearValidationError = (error) => {
+    const remainingErrors = validationErrors.filter(item => item !== error)
+    setValidationErrors(remainingErrors)
+    setMessage(remainingErrors.length
+      ? 'Faltan datos: rellena ' + remainingErrors.join(', ')
+      : '')
+  }
+
   const todayConsumptions = consumptions.filter(c => c.date === selectedDate)
+  const mealsByType = todayConsumptions.reduce((groups, consumption) => {
+    if (!groups[consumption.meal]) {
+      groups[consumption.meal] = []
+    }
+    groups[consumption.meal].push(consumption)
+    return groups
+  }, {})
+  const orderedMealTypes = [
+    ...mealTypes,
+    ...Object.keys(mealsByType).filter(mealType => !mealTypes.includes(mealType))
+  ]
   const selectedFoodData = selectedFood?.food
 
   const customStyles = {
-    control: (base) => ({
+    control: (base, state) => ({
       ...base,
-      borderColor: '#e2e8f0',
+      borderColor: validationErrors.includes('alimento')
+        ? '#ff453a'
+        : state.isFocused ? '#ff375f' : '#3a3d45',
       borderWidth: '2px',
       borderRadius: '8px',
       padding: '4px',
+      backgroundColor: '#101216',
+      color: '#f5f5f7',
       fontSize: '1rem',
+      boxShadow: validationErrors.includes('alimento')
+        ? '0 0 0 3px rgba(255, 69, 58, 0.16)'
+        : state.isFocused ? '0 0 0 3px rgba(255, 55, 95, 0.16)' : 'none',
       '&:hover': {
-        borderColor: '#667eea'
+        borderColor: '#ff375f'
       }
+    }),
+    input: (base) => ({
+      ...base,
+      color: '#f5f5f7'
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: '#f5f5f7'
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: '#92949b'
     }),
     menu: (base) => ({
       ...base,
+      backgroundColor: '#17191e',
       borderRadius: '8px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+      boxShadow: '0 12px 32px rgba(0,0,0,0.48)'
     }),
     option: (base, state) => ({
       ...base,
-      backgroundColor: state.isSelected ? '#667eea' : state.isFocused ? '#f0f4ff' : 'white',
-      color: state.isSelected ? 'white' : '#2d3748',
+      backgroundColor: state.isSelected ? '#ff375f' : state.isFocused ? '#292c33' : '#17191e',
+      color: '#f5f5f7',
       cursor: 'pointer',
       padding: '12px'
     })
@@ -152,13 +195,7 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
 
   return (
     <div className="registro">
-      <h2>📝 Registrar Consumo</h2>
-
-      {message && (
-        <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-error'}`}>
-          {message}
-        </div>
-      )}
+      <div className="registro-heading-spacer" aria-hidden="true" />
 
       <div className="form-group date-form-group">
         <div className="current-date-display" aria-label={`Fecha actual: ${displayDate}`}>
@@ -168,7 +205,15 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
 
       <div className="form-group">
         <label>Tipo de Comida</label>
-        <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
+        <select
+          className={`${selectedMeal ? 'has-value' : 'is-placeholder'} ${validationErrors.includes('tipo de comida') ? 'field-invalid' : ''}`}
+          value={selectedMeal}
+          aria-invalid={validationErrors.includes('tipo de comida')}
+          onChange={(e) => {
+            setSelectedMeal(e.target.value)
+            if (e.target.value) clearValidationError('tipo de comida')
+          }}
+        >
           <option value="">Selecciona comida</option>
           {mealTypes.map(meal => (
             <option key={meal} value={meal}>
@@ -184,9 +229,14 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
             <label htmlFor="custom-meal-name">Nombre del plato</label>
             <input
               id="custom-meal-name"
+              className={validationErrors.includes('nombre del plato') ? 'field-invalid' : ''}
               type="text"
               value={customMealName}
-              onChange={(e) => setCustomMealName(e.target.value)}
+              aria-invalid={validationErrors.includes('nombre del plato')}
+              onChange={(e) => {
+                setCustomMealName(e.target.value)
+                if (e.target.value.trim()) clearValidationError('nombre del plato')
+              }}
               placeholder="Ej: Paella casera"
               maxLength="60"
             />
@@ -196,9 +246,16 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
               <label htmlFor={`custom-${key}`}>{label}</label>
               <input
                 id={`custom-${key}`}
+                className={validationErrors.includes(label) ? 'field-invalid' : ''}
                 type="number"
                 value={customMacros[key]}
-                onChange={(e) => setCustomMacros(prev => ({ ...prev, [key]: e.target.value }))}
+                aria-invalid={validationErrors.includes(label)}
+                onChange={(e) => {
+                  setCustomMacros(prev => ({ ...prev, [key]: e.target.value }))
+                  if (e.target.value !== '' && Number.isFinite(Number(e.target.value)) && Number(e.target.value) >= 0) {
+                    clearValidationError(label)
+                  }
+                }}
                 min="0"
                 step={step}
                 onWheel={(e) => e.currentTarget.blur()}
@@ -209,11 +266,15 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
       ) : (
         <>
           <div className="form-group">
-            <label>🔍 Buscar Alimento</label>
+            <label>Buscar Alimento</label>
             <Select
               options={foodOptions}
               value={selectedFood}
-              onChange={setSelectedFood}
+              onChange={(food) => {
+                setSelectedFood(food)
+                if (food) clearValidationError('alimento')
+              }}
+              aria-invalid={validationErrors.includes('alimento')}
               placeholder="Escribe para buscar alimento..."
               isClearable
               isSearchable
@@ -226,8 +287,13 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
             <label>Cantidad (gramos)</label>
             <input
               type="number"
+              className={validationErrors.includes('cantidad en gramos') ? 'field-invalid' : ''}
               value={grams}
-              onChange={(e) => setGrams(e.target.value)}
+              aria-invalid={validationErrors.includes('cantidad en gramos')}
+              onChange={(e) => {
+                setGrams(e.target.value)
+                if (Number(e.target.value) > 0) clearValidationError('cantidad en gramos')
+              }}
               placeholder="Ej: 150"
               min="1"
               step="0.1"
@@ -239,7 +305,7 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
 
       {selectedFoodData && grams && (
         <div className="nutrient-info">
-          <p>📊 Macros para {grams}g de {selectedFood.value}:</p>
+          <p>Macros para {grams}g de {selectedFood.value}:</p>
           <div className="nutrient-grid">
             <div>
               <strong>{Math.round(selectedFoodData.kcal * (grams / 100))}</strong> kcal
@@ -261,58 +327,73 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
       )}
 
       <button onClick={handleRegister} className="btn-primary">
-        ✅ Registrar Consumo
+        Registrar Consumo
       </button>
+
+      {message && (
+        <div
+          className={`alert show ${message.startsWith('Registrado') ? 'alert-success' : 'alert-error'}`}
+          role="alert"
+          aria-live="assertive"
+        >
+          {message}
+        </div>
+      )}
 
       {todayConsumptions.length > 0 && (
         <>
-          <h3>📋 Registros de hoy</h3>
-          <div className="table-container">
-            <table className="consumptions-table">
-              <thead>
-                <tr>
-                  <th>Com</th>
-                  <th>Alim</th>
-                  <th>Grs</th>
-                  <th>Kcal</th>
-                  <th>P</th>
-                  <th>G</th>
-                  <th>C</th>
-                  <th>Fib</th>
-                  <th>X</th>
-                </tr>
-              </thead>
-              <tbody>
-                {todayConsumptions.map(consumption => (
-                  <tr key={consumption.id}>
-                    <td className="meal-cell">{consumption.meal}</td>
-                    <td className="food-name-cell">{consumption.foodName}</td>
-                    <td>{consumption.grams == null ? '—' : `${consumption.grams}g`}</td>
-                    <td>{consumption.kcal}</td>
-                    <td>{consumption.protein}g</td>
-                    <td>{consumption.fats}g</td>
-                    <td>{consumption.carbs}g</td>
-                    <td>{(consumption.fiber || 0).toFixed(1)}g</td>
-                    <td>
-                      <button
-                        onClick={() => setConsumptions(prevConsumptions => prevConsumptions.filter(c => c.id !== consumption.id))}
-                        className="btn-delete"
-                        aria-label="Eliminar registro"
-                      >
-                        🗑️
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <h3>Registros de hoy</h3>
+          <div className="today-meals-list">
+            {orderedMealTypes.filter(mealType => mealsByType[mealType]).map(mealType => (
+              <section className="meal-record-card" key={mealType}>
+                <h4 className="meal-record-title">{mealType}</h4>
+                <div className="table-container meal-table-container">
+                  <table className="consumptions-table">
+                    <thead>
+                      <tr>
+                        <th>Alimento</th>
+                        <th>Grs</th>
+                        <th>Kcal</th>
+                        <th>Pro</th>
+                        <th>Gra</th>
+                        <th>Hid</th>
+                        <th>Fib</th>
+                        <th aria-label="Acciones" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {mealsByType[mealType].map(consumption => (
+                        <tr key={consumption.id}>
+                          <td className="food-name-cell">{consumption.foodName}</td>
+                          <td>{consumption.grams == null ? '—' : `${consumption.grams}g`}</td>
+                          <td>{consumption.kcal}</td>
+                          <td>{consumption.protein}g</td>
+                          <td>{consumption.fats}g</td>
+                          <td>{consumption.carbs}g</td>
+                          <td>{(consumption.fiber || 0).toFixed(1)}g</td>
+                          <td>
+                            <button
+                              onClick={() => setConsumptions(prevConsumptions => prevConsumptions.filter(c => c.id !== consumption.id))}
+                              className="delete-extra-button"
+                              aria-label={`Eliminar ${consumption.foodName}`}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ))}
           </div>
         </>
       )}
 
       {todayConsumptions.length === 0 && (
         <div className="empty-message">
-          No hay registros para hoy. ¡Comienza a registrar! 🍎
+          No hay registros para hoy. Comienza a registrar.
         </div>
       )}
     </div>

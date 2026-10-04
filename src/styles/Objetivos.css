@@ -199,3 +199,208 @@
     font-size: 0.85rem;
   }
 }
+
+.objetivos {
+  display: grid;
+  gap: 28px;
+  color: #f5f5f7;
+}
+
+.goals-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.goals-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.goals-eyebrow {
+  color: #92949b;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.goals-heading h2 {
+  margin: 0;
+  color: #f5f5f7;
+  font-size: 1.35rem;
+}
+
+.goal-tile {
+  display: flex;
+  min-width: 0;
+  min-height: 116px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 !important;
+  padding: 16px;
+  border: 1px solid #30333a;
+  border-radius: 17px;
+  background: #17191e;
+  color: #d0d1d5;
+}
+
+.goal-label {
+  display: block;
+  margin: 0 !important;
+  color: #a4a6ad !important;
+  font-size: 0.82rem !important;
+  font-weight: 600;
+}
+
+.calorie-goal-tile {
+  min-height: 82px;
+  flex-direction: row;
+  align-items: center;
+  border-color: rgba(100, 210, 255, 0.25);
+}
+
+.calorie-goal-tile .goal-label {
+  color: #d0d1d5 !important;
+  font-size: 0.9rem !important;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.macro-goal-tile {
+  border-color: color-mix(in srgb, var(--goal-color) 25%, #30333a);
+}
+
+.goal-input-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.goal-tile input,
+.app-dark .objetivos .goal-tile input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 1px solid #3a3d45;
+  border-radius: 0;
+  background: transparent;
+  color: var(--goal-color, #64d2ff);
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.goal-tile input:focus {
+  border-color: var(--goal-color, #64d2ff);
+  outline: none;
+  box-shadow: none;
+}
+
+.goal-unit {
+  flex: 0 0 auto;
+  color: #92949b;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.goals-save-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 2px;
+}
+
+.goal-guidance {
+  border-top: 1px solid #30333a;
+}
+
+.goal-guidance-panel {
+  border-bottom: 1px solid #30333a;
+}
+
+.goal-guidance-panel summary {
+  padding: 16px 2px;
+  color: #e5e5e7;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.goal-guidance-content {
+  padding: 0 2px 16px;
+}
+
+.guidance-intro {
+  margin-bottom: 14px;
+  color: #a4a6ad;
+  font-size: 0.82rem;
+}
+
+.formula-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.formula-row {
+  min-width: 0;
+}
+
+.formula-row h4 {
+  margin-bottom: 8px;
+  color: #f5f5f7;
+  font-size: 0.82rem;
+}
+
+.formula-row p {
+  margin: 5px 0;
+  color: #a4a6ad;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.guidance-disclaimer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #30333a;
+  color: #a4a6ad;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.goal-guidance .tips-list {
+  padding: 0 2px 10px;
+}
+
+.goal-guidance .tips-list li {
+  padding: 10px 0;
+  border-bottom-color: #30333a;
+  color: #a4a6ad;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  .formula-list {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .goals-grid {
+    gap: 8px;
+  }
+
+  .goal-tile {
+    padding: 12px;
+  }
+}

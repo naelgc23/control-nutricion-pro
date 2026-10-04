@@ -1,21 +1,21 @@
 {
-  "name": "Control Nutrición Pro",
-  "short_name": "Nutrición Pro",
-  "description": "Controla tus macronutrientes de forma fácil y eficiente. 87 alimentos incluidos, datos locales, sin conexión requerida.",
+  "name": "Nutrack",
+  "short_name": "Nutrack",
+  "description": "Seguimiento diario de calorías, macros y hábitos nutricionales.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#667eea",
+  "background_color": "#0b0c0f",
+  "theme_color": "#0b0c0f",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192' rx='44'/><text x='50%' y='50%' font-size='140' text-anchor='middle' dominant-baseline='middle' fill='white'>🥗</text></svg>",
+      "src": "/nutrack-mark.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23667eea' width='512' height='512' rx='110'/><text x='50%' y='50%' font-size='360' text-anchor='middle' dominant-baseline='middle' fill='white'>🥗</text></svg>",
+      "src": "/nutrack-mark.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable"
@@ -23,13 +23,13 @@
   ],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23667eea' width='540' height='720'/><text x='50%' y='300' font-size='200' text-anchor='middle' dominant-baseline='middle' fill='white'>📊</text><text x='50%' y='550' font-size='40' text-anchor='middle' fill='white' font-weight='bold'>Control Nutrición Pro</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%230b0c0f' width='540' height='720'/><text x='50%' y='300' font-size='200' text-anchor='middle' dominant-baseline='middle' fill='white'>N</text><text x='50%' y='550' font-size='40' text-anchor='middle' fill='white' font-weight='bold'>Nutrack</text></svg>",
       "sizes": "540x720",
       "type": "image/svg+xml",
       "form_factor": "narrow"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%23667eea' width='1280' height='720'/><text x='50%' y='300' font-size='200' text-anchor='middle' dominant-baseline='middle' fill='white'>📊</text><text x='50%' y='550' font-size='40' text-anchor='middle' fill='white' font-weight='bold'>Control Nutrición Pro</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%230b0c0f' width='1280' height='720'/><text x='50%' y='300' font-size='200' text-anchor='middle' dominant-baseline='middle' fill='white'>N</text><text x='50%' y='550' font-size='40' text-anchor='middle' fill='white' font-weight='bold'>Nutrack</text></svg>",
       "sizes": "1280x720",
       "type": "image/svg+xml",
       "form_factor": "wide"
@@ -44,7 +44,7 @@
       "url": "/?tab=registro",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23667eea' width='192' height='192' rx='44'/><text x='50%' y='50%' font-size='140' text-anchor='middle' dominant-baseline='middle' fill='white'>📝</text></svg>",
+          "src": "/nutrack-mark.svg",
           "sizes": "192x192"
         }
       ]

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import packageJson from '../package.json';
+import { Home, ClipboardList, Utensils, Target } from 'lucide-react';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import Dashboard from './pages/Dashboard';
 import Registro from './pages/Registro';
 import Alimentos from './pages/Alimentos';
 import Objetivos from './pages/Objetivos';
-import Historial from './pages/Historial';
 import './App.css';
 
 const APP_VERSION = packageJson.version || 'dev';
@@ -30,37 +30,26 @@ function App() {
   }, [goals, setGoals]);
 
   const tabs = [
-    { id: 'dashboard', label: '📊 Dashboard', component: Dashboard },
-    { id: 'registro', label: '📝 Registrar', component: Registro },
-    { id: 'alimentos', label: '🍎 Alimentos', component: Alimentos },
-    { id: 'objetivos', label: '🎯 Objetivos', component: Objetivos },
-    { id: 'historial', label: '📅 Historial', component: Historial }
+    { id: 'dashboard', label: 'Hoy', Icon: Home, component: Dashboard },
+    { id: 'registro', label: 'Registrar', Icon: ClipboardList, component: Registro },
+    { id: 'alimentos', label: 'Alimentos', Icon: Utensils, component: Alimentos },
+    { id: 'objetivos', label: 'Objetivos', Icon: Target, component: Objetivos }
   ];
 
   const currentComponent = tabs.find(t => t.id === activeTab)?.component;
   const CurrentComponent = currentComponent;
 
   return (
-    <div className="app">
+    <div className="app app-dark">
       <header className="app-header">
-        <h1>🥗 Control Nutrición Pro</h1>
-        <p>Controla tus macronutrientes de forma fácil</p>
+        <div className="brand-lockup">
+          <img className="brand-mark" src="/nutrack-mark.svg" alt="" />
+          <h1>Nutrack</h1>
+        </div>
         <div className="app-version">v{APP_VERSION}</div>
       </header>
 
-      <div className="tabs">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="tab-content">
+      <main className="tab-content">
         {CurrentComponent && (
           <CurrentComponent
             foods={foods}
@@ -71,9 +60,25 @@ function App() {
             setDailyRecords={setDailyRecords}
             goals={goals}
             setGoals={setGoals}
+            navigateToTab={setActiveTab}
           />
         )}
-      </div>
+      </main>
+
+      <nav className="bottom-nav" aria-label="Navegación principal">
+        {tabs.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            type="button"
+            className={`bottom-nav-button ${activeTab === id ? 'active' : ''}`}
+            onClick={() => setActiveTab(id)}
+            aria-current={activeTab === id ? 'page' : undefined}
+          >
+            <Icon size={20} strokeWidth={2} aria-hidden="true" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

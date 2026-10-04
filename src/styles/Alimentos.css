@@ -137,7 +137,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
-  font-size: 0.9rem;
+  font-size: 0.72rem;
 }
 
 .foods-table thead {
@@ -146,10 +146,29 @@
 }
 
 .foods-table th {
-  padding: 15px;
-  text-align: left;
+  padding: 6px 6px;
+  text-align: center;
   font-weight: 600;
+  font-size: 0.7rem;
   border: none;
+}
+
+.foods-table th:first-child,
+.foods-table td:first-child {
+  text-align: left;
+}
+
+.foods-table th:nth-child(2),
+.foods-table td:nth-child(2),
+.foods-table th:nth-child(3),
+.foods-table td:nth-child(3),
+.foods-table th:nth-child(4),
+.foods-table td:nth-child(4),
+.foods-table th:nth-child(5),
+.foods-table td:nth-child(5),
+.foods-table th:nth-child(6),
+.foods-table td:nth-child(6) {
+  text-align: center;
 }
 
 .sortable-header {
@@ -163,9 +182,14 @@
 }
 
 .foods-table td {
-  padding: 12px 15px;
+  padding: 6px 6px;
   border-bottom: 1px solid #e2e8f0;
   background: white;
+}
+
+.foods-table th:last-child,
+.foods-table td:last-child {
+  text-align: center;
 }
 
 .foods-table tbody tr:hover {
@@ -180,7 +204,21 @@
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 4px;
+}
+
+.foods-table .delete-extra-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: #332023;
+  color: #ff6961;
+  cursor: pointer;
 }
 
 .btn-edit,
@@ -356,12 +394,12 @@
   }
 
   .foods-table {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
   }
 
   .foods-table th,
   .foods-table td {
-    padding: 10px;
+    padding: 6px 6px;
   }
 }
 
@@ -391,5 +429,14 @@
 
   .search-input {
     font-size: 16px;
+  }
+
+  .foods-table {
+    font-size: 0.68rem;
+  }
+
+  .foods-table th,
+  .foods-table td {
+    padding: 5px 4px;
   }
 }

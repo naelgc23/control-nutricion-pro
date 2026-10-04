@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import '../styles/Objetivos.css';
 
+const MACRO_GOALS = [
+  { key: 'protein', label: 'Proteína', color: '#ff375f' },
+  { key: 'fats', label: 'Grasas', color: '#ffd60a' },
+  { key: 'carbs', label: 'Hidratos', color: '#64d2ff' },
+  { key: 'fiber', label: 'Fibra', color: '#30d158' }
+];
+
 function Objetivos({ goals, setGoals }) {
   const [formGoals, setFormGoals] = useState(goals);
   const [alert, setAlert] = useState(null);
 
   const handleSave = () => {
     setGoals(formGoals);
-    showAlert('✅ Objetivos guardados correctamente', 'success');
+    showAlert('Objetivos guardados correctamente', 'success');
   };
 
   const showAlert = (message, type) => {
@@ -23,119 +30,102 @@ function Objetivos({ goals, setGoals }) {
         </div>
       )}
 
-      <div className="card">
-        <h2>🎯 Mis Objetivos Nutricionales</h2>
+      <section className="goals-editor">
+        <header className="goals-heading">
+          <p className="goals-eyebrow">OBJETIVOS DIARIOS</p>
+          <h2>Mis objetivos</h2>
+        </header>
 
-        <div className="goals-grid">
-          <div className="form-group">
-            <label>🔥 Calorías Diarias</label>
+        <label className="goal-tile calorie-goal-tile" htmlFor="goal-calories">
+          <span className="goal-label">Calorías</span>
+          <span className="goal-input-row">
             <input
+              id="goal-calories"
               type="number"
+              min="0"
+              step="1"
               value={formGoals.calories}
               onChange={(e) => setFormGoals({ ...formGoals, calories: parseInt(e.target.value) })}
             />
-            <small>Kcal/día</small>
-          </div>
+            <span className="goal-unit">Kcal/día</span>
+          </span>
+        </label>
 
-          <div className="form-group">
-            <label>💪 Proteína</label>
-            <input
-              type="number"
-              value={formGoals.protein}
-              onChange={(e) => setFormGoals({ ...formGoals, protein: parseInt(e.target.value) })}
-            />
-            <small>gramos/día</small>
-          </div>
-
-          <div className="form-group">
-            <label>🧈 Grasas</label>
-            <input
-              type="number"
-              value={formGoals.fats}
-              onChange={(e) => setFormGoals({ ...formGoals, fats: parseInt(e.target.value) })}
-            />
-            <small>gramos/día</small>
-          </div>
-
-          <div className="form-group">
-            <label>🌾 Hidratos</label>
-            <input
-              type="number"
-              value={formGoals.carbs}
-              onChange={(e) => setFormGoals({ ...formGoals, carbs: parseInt(e.target.value) })}
-            />
-            <small>gramos/día</small>
-          </div>
-
-          <div className="form-group">
-            <label>🌿 Fibra</label>
-            <input
-              type="number"
-              value={formGoals.fiber ?? 30}
-              onChange={(e) => setFormGoals({ ...formGoals, fiber: parseInt(e.target.value) })}
-            />
-            <small>gramos/día</small>
-          </div>
+        <div className="goals-grid">
+          {MACRO_GOALS.map(({ key, label, color }) => (
+            <label
+              className="goal-tile macro-goal-tile"
+              key={key}
+              style={{ '--goal-color': color }}
+              htmlFor={`goal-${key}`}
+            >
+              <span className="goal-label">{label}</span>
+              <span className="goal-input-row">
+                <input
+                  id={`goal-${key}`}
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formGoals[key] ?? (key === 'fiber' ? 30 : '')}
+                  onChange={(e) => setFormGoals({ ...formGoals, [key]: parseInt(e.target.value) })}
+                />
+                <span className="goal-unit">g/día</span>
+              </span>
+            </label>
+          ))}
         </div>
 
-        <button className="btn btn-primary" onClick={handleSave}>
-          💾 Guardar Objetivos
+        <button className="btn btn-primary goals-save-button" onClick={handleSave}>
+          Guardar objetivos
         </button>
-      </div>
+      </section>
 
-      <div className="card">
-        <h2>📋 Cálculo rápido de objetivos</h2>
-        
-        <div className="info-section">
-          <h3>Fórmulas recomendadas según actividad:</h3>
-          
-          <div className="formula-card">
-            <h4>Sedentario (poco ejercicio)</h4>
-            <ul>
-              <li>Calorías: Peso (kg) × 25-28</li>
-              <li>Proteína: Peso (kg) × 1.2-1.6g</li>
-              <li>Grasas: 20-30% de calorías totales</li>
-              <li>Hidratos: El resto</li>
-            </ul>
+      <section className="goal-guidance">
+        <details className="goal-guidance-panel">
+          <summary>Cálculo orientativo de objetivos</summary>
+          <div className="goal-guidance-content">
+            <p className="guidance-intro">Fórmulas recomendadas según actividad:</p>
+            <div className="formula-list">
+              <div className="formula-row">
+                <h4>Sedentario (poco ejercicio)</h4>
+                <p>Calorías: Peso (kg) × 25-28</p>
+                <p>Proteína: Peso (kg) × 1.2-1.6 g</p>
+                <p>Grasas: 20-30% de calorías totales</p>
+                <p>Hidratos: el resto</p>
+              </div>
+              <div className="formula-row">
+                <h4>Moderadamente activo (3-4 días/semana)</h4>
+                <p>Calorías: Peso (kg) × 30-35</p>
+                <p>Proteína: Peso (kg) × 1.6-2.2 g</p>
+                <p>Grasas: 25-35% de calorías totales</p>
+                <p>Hidratos: el resto</p>
+              </div>
+              <div className="formula-row">
+                <h4>Muy activo (5-6 días/semana)</h4>
+                <p>Calorías: Peso (kg) × 35-40</p>
+                <p>Proteína: Peso (kg) × 2.2-2.6 g</p>
+                <p>Grasas: 25-30% de calorías totales</p>
+                <p>Hidratos: el resto</p>
+              </div>
+            </div>
+            <p className="guidance-disclaimer">
+              Estos son valores de referencia generales. Para un plan personalizado, consulta con un nutricionista o dietista profesional.
+            </p>
           </div>
+        </details>
 
-          <div className="formula-card">
-            <h4>Moderadamente activo (3-4 días/semana)</h4>
-            <ul>
-              <li>Calorías: Peso (kg) × 30-35</li>
-              <li>Proteína: Peso (kg) × 1.6-2.2g</li>
-              <li>Grasas: 25-35% de calorías totales</li>
-              <li>Hidratos: El resto</li>
-            </ul>
-          </div>
-
-          <div className="formula-card">
-            <h4>Muy activo (5-6 días/semana)</h4>
-            <ul>
-              <li>Calorías: Peso (kg) × 35-40</li>
-              <li>Proteína: Peso (kg) × 2.2-2.6g</li>
-              <li>Grasas: 25-30% de calorías totales</li>
-              <li>Hidratos: El resto</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="disclaimer">
-          <p><strong>⚠️ IMPORTANTE:</strong> Estos son valores de referencia generales. Para un plan personalizado, consulta con un nutricionista o dietista profesional.</p>
-        </div>
-      </div>
-
-      <div className="card">
-        <h2>💡 Tips para establecer objetivos</h2>
-        <ul className="tips-list">
-          <li>✓ Sé realista con tus metas iniciales</li>
-          <li>✓ Ajusta según cómo te sientas después de 2 semanas</li>
-          <li>✓ La proteína es lo más importante (1.6-2.2g/kg)</li>
-          <li>✓ No reduzcas grasas por debajo del 20% de calorías</li>
-          <li>✓ Los hidratos son flexibles según tu energía</li>
-          <li>✓ Revisa tus objetivos cada mes</li>
-        </ul>
-      </div>
+        <details className="goal-guidance-panel">
+          <summary>Consejos para establecer objetivos</summary>
+          <ul className="tips-list">
+            <li>Sé realista con tus metas iniciales</li>
+            <li>Ajusta según cómo te sientas después de 2 semanas</li>
+            <li>La proteína es lo más importante (1.6-2.2 g/kg)</li>
+            <li>No reduzcas grasas por debajo del 20% de calorías</li>
+            <li>Los hidratos son flexibles según tu energía</li>
+            <li>Revisa tus objetivos cada mes</li>
+          </ul>
+        </details>
+      </section>
     </div>
   );
 }

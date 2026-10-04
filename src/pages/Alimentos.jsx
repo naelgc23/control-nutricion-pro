@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Trash2 } from 'lucide-react';
 import '../styles/Alimentos.css';
 
 const sortLabels = {
@@ -197,7 +198,7 @@ function Alimentos({ foods, setFoods }) {
 
       <div className="card">
         <div className="foods-header">
-          <h2>🍎 Base de Datos de Alimentos ({foods.length} alimentos)</h2>
+          <h2>Base de Datos de Alimentos ({foods.length})</h2>
           <button className="btn btn-primary" onClick={openAddModal}>
             ➕ Agregar Alimento
           </button>
@@ -264,16 +265,16 @@ function Alimentos({ foods, setFoods }) {
                   Kcal {sortConfig.key === 'kcal' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('protein')} className="sortable-header">
-                  Proteína {sortConfig.key === 'protein' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Pro {sortConfig.key === 'protein' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('fats')} className="sortable-header">
-                  Grasas {sortConfig.key === 'fats' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Gra {sortConfig.key === 'fats' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('carbs')} className="sortable-header">
-                  Hidratos {sortConfig.key === 'carbs' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Hid {sortConfig.key === 'carbs' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th onClick={() => handleSort('fiber')} className="sortable-header">
-                  Fibra {sortConfig.key === 'fiber' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Fib {sortConfig.key === 'fiber' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </th>
                 <th>Acción</th>
               </tr>
@@ -300,11 +301,12 @@ function Alimentos({ foods, setFoods }) {
                           ✎
                         </button>
                         <button
-                          className="btn-delete"
+                          className="delete-extra-button"
                           onClick={() => confirmDeleteFood(originalIndex)}
                           title="Eliminar alimento"
+                          aria-label={`Eliminar ${food.name}`}
                         >
-                          ✕
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

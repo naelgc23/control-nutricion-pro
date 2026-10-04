@@ -1,6 +1,6 @@
 {
   "appId": "com.nutricionpro.app",
-  "appName": "Control Nutrición Pro",
+  "appName": "Nutrack",
   "webDir": "build",
   "bundledWebRuntime": false,
   "plugins": {
@@ -12,6 +12,7 @@
     "androidScheme": "https"
   },
   "ios": {
+    "backgroundColor": "#0b0c0f",
     "contentInset": "automatic"
   }
 }
