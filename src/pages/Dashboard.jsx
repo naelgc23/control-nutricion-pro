@@ -187,9 +187,11 @@ function Dashboard({
   }, [calendarMonth]);
 
   const monthlyStats = useMemo(() => {
-    const monthDates = Object.keys(totalsByDate).filter(date => date.startsWith(selectedMonthKey));
+    const monthDates = Object.keys(totalsByDate).filter(date => (
+      date.startsWith(selectedMonthKey) && date < today
+    ));
     const monthRecords = Object.entries(dailyRecords || {}).filter(([date]) => (
-      date.startsWith(selectedMonthKey)
+      date.startsWith(selectedMonthKey) && date < today
     ));
     const burnedCalories = monthRecords
       .map(([, record]) => record?.burnedCalories)
@@ -208,10 +210,10 @@ function Dashboard({
     return {
       loggedDays: monthDates.length,
       averageKcal: Math.round(totals.kcal / days),
-      averageProtein: (totals.protein / days).toFixed(1),
-      averageFats: (totals.fats / days).toFixed(1),
-      averageCarbs: (totals.carbs / days).toFixed(1),
-      averageFiber: (totals.fiber / days).toFixed(1),
+      averageProtein: Math.round(totals.protein / days),
+      averageFats: Math.round(totals.fats / days),
+      averageCarbs: Math.round(totals.carbs / days),
+      averageFiber: Math.round(totals.fiber / days),
       creatineDays: monthRecords.filter(([, record]) => record?.creatineTaken).length,
       averageBurned: burnedCalories.length
         ? Math.round(burnedCalories.reduce((sum, value) => sum + value, 0) / burnedCalories.length)
@@ -356,7 +358,13 @@ function Dashboard({
         </div>
       </section>
 
-      <button className="add-meal-fab" type="button" onClick={() => navigateToTab('registro')}>
+      <button
+        className="add-meal-fab"
+        type="button"
+        onClick={() => navigateToTab('registro')}
+        disabled={selectedDate !== today}
+        title={selectedDate !== today ? 'Solo puedes añadir comidas para hoy' : undefined}
+      >
         <Plus size={20} />
         <span>Agregar comida</span>
       </button>

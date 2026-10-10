@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import packageJson from '../package.json';
 import { Home, ClipboardList, Utensils, Target } from 'lucide-react';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -12,6 +12,7 @@ const APP_VERSION = packageJson.version || 'dev';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const appRef = useRef(null);
   const [foods, setFoods] = useLocalStorage('foods', getDefaultFoods());
   const [consumptions, setConsumptions] = useLocalStorage('consumptions', []);
   const [goals, setGoals] = useLocalStorage('goals', getDefaultGoals());
@@ -29,6 +30,10 @@ function App() {
     }
   }, [goals, setGoals]);
 
+  useEffect(() => {
+    appRef.current?.scrollTo(0, 0);
+  }, [activeTab]);
+
   const tabs = [
     { id: 'dashboard', label: 'Hoy', Icon: Home, component: Dashboard },
     { id: 'registro', label: 'Registrar', Icon: ClipboardList, component: Registro },
@@ -40,7 +45,7 @@ function App() {
   const CurrentComponent = currentComponent;
 
   return (
-    <div className="app app-dark">
+    <div className="app app-dark" ref={appRef}>
       <header className="app-header">
         <div className="brand-lockup">
           <img className="brand-mark" src="/nutrack-mark.svg" alt="" />

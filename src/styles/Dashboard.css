@@ -638,6 +638,13 @@
   transform: scale(0.97);
 }
 
+.add-meal-fab:disabled {
+  background: #30333a;
+  color: var(--dashboard-text-muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
 .calendar-overlay {
   position: fixed;
   z-index: 50;
