@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   Calendar,
   ChevronLeft,
@@ -106,6 +106,9 @@ function Dashboard({
   const [calendarMonth, setCalendarMonth] = useState(today.slice(0, 7));
   const [mealsExpanded, setMealsExpanded] = useState(false);
   const [extraFormOpen, setExtraFormOpen] = useState(false);
+  const [weekSlide, setWeekSlide] = useState('');
+  const [weekSlideKey, setWeekSlideKey] = useState(0);
+  const weekSwipeStartX = useRef(null);
   const [extraMacros, setExtraMacros] = useState({
     kcal: '',
     protein: '',
@@ -276,6 +279,25 @@ function Dashboard({
     : 0;
   const caloriesProgress = Math.max(0, Math.min(caloriesPercentage, 100));
 
+  const handleWeekSwipeStart = (event) => {
+    weekSwipeStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleWeekSwipeEnd = (event) => {
+    const startX = weekSwipeStartX.current;
+    const endX = event.changedTouches[0]?.clientX;
+    weekSwipeStartX.current = null;
+
+    if (startX === null || endX === undefined || Math.abs(endX - startX) < 50) return;
+
+    const movingToNextWeek = endX < startX;
+    const nextDate = parseDateKey(selectedDate);
+    nextDate.setDate(nextDate.getDate() + (movingToNextWeek ? 7 : -7));
+    setWeekSlide(movingToNextWeek ? 'is-sliding-next' : 'is-sliding-previous');
+    setWeekSlideKey(previousKey => previousKey + 1);
+    setSelectedDate(toDateKey(nextDate));
+  };
+
   return (
     <div className="dashboard">
       <section className="summary-topline">
@@ -288,26 +310,38 @@ function Dashboard({
         </button>
       </section>
 
-      <section className="week-strip" aria-label="Seleccionar día de la semana">
-        {weekDays.map(date => {
-          const dateKey = toDateKey(date);
-          const dayTotals = totalsByDate[dateKey] || EMPTY_TOTALS;
-          return (
-            <button
-              type="button"
-              key={dateKey}
-              className={`week-day ${dateKey === selectedDate ? 'is-selected' : ''} ${dateKey === today ? 'is-today' : ''}`}
-              onClick={() => setSelectedDate(dateKey)}
-              aria-label={date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-              aria-pressed={dateKey === selectedDate}
-            >
-              <span className="week-day-name">{WEEKDAY_LABELS[date.getDay()]}</span>
-              <span className="week-day-ring">
-                <MacroRings totals={dayTotals} goals={goals} />
-              </span>
-            </button>
-          );
-        })}
+      <section
+        className="week-strip"
+        aria-label="Seleccionar día de la semana. Desliza horizontalmente para cambiar de semana"
+        onTouchStart={handleWeekSwipeStart}
+        onTouchEnd={handleWeekSwipeEnd}
+        onTouchCancel={() => { weekSwipeStartX.current = null; }}
+      >
+        <div
+          key={weekSlideKey}
+          className={`week-strip-content ${weekSlide}`}
+          onAnimationEnd={() => setWeekSlide('')}
+        >
+          {weekDays.map(date => {
+            const dateKey = toDateKey(date);
+            const dayTotals = totalsByDate[dateKey] || EMPTY_TOTALS;
+            return (
+              <button
+                type="button"
+                key={dateKey}
+                className={`week-day ${dateKey === selectedDate ? 'is-selected' : ''} ${dateKey === today ? 'is-today' : ''}`}
+                onClick={() => setSelectedDate(dateKey)}
+                aria-label={date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+                aria-pressed={dateKey === selectedDate}
+              >
+                <span className="week-day-name">{WEEKDAY_LABELS[date.getDay()]}</span>
+                <span className="week-day-ring">
+                  <MacroRings totals={dayTotals} goals={goals} />
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       <section className={`calories-card ${caloriesPercentage > 100 ? 'is-over-target' : ''}`}>
