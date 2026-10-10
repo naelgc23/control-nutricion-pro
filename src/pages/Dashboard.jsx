@@ -485,7 +485,10 @@ function Dashboard({
       </section>
 
       <details className="monthly-summary">
-        <summary>Resumen de {selectedMonthLabel}</summary>
+        <summary>
+          <span>Resumen de {selectedMonthLabel}</span>
+          <ChevronRight size={18} aria-hidden="true" />
+        </summary>
         <div className="monthly-summary-grid">
           <MonthlyStat label="Días registrados" value={monthlyStats.loggedDays} />
           <MonthlyStat label="Promedio kcal" value={monthlyStats.averageKcal} />

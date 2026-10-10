@@ -328,11 +328,29 @@
 }
 
 .goal-guidance-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 16px 2px;
   color: #e5e5e7;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  list-style: none;
+}
+
+.goal-guidance-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.goal-guidance-panel summary > svg {
+  flex: 0 0 auto;
+  color: #92949b;
+  transition: transform 0.2s ease;
+}
+
+.goal-guidance-panel[open] summary > svg {
+  transform: rotate(90deg);
 }
 
 .goal-guidance-content {

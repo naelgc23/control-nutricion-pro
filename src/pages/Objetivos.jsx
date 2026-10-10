@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 import '../styles/Objetivos.css';
 
 const MACRO_GOALS = [
@@ -82,7 +83,10 @@ function Objetivos({ goals, setGoals }) {
 
       <section className="goal-guidance">
         <details className="goal-guidance-panel">
-          <summary>Cálculo orientativo de objetivos</summary>
+          <summary>
+            <span>Cálculo orientativo de objetivos</span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </summary>
           <div className="goal-guidance-content">
             <p className="guidance-intro">Fórmulas recomendadas según actividad:</p>
             <div className="formula-list">
@@ -115,7 +119,10 @@ function Objetivos({ goals, setGoals }) {
         </details>
 
         <details className="goal-guidance-panel">
-          <summary>Consejos para establecer objetivos</summary>
+          <summary>
+            <span>Consejos para establecer objetivos</span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </summary>
           <ul className="tips-list">
             <li>Sé realista con tus metas iniciales</li>
             <li>Ajusta según cómo te sientas después de 2 semanas</li>

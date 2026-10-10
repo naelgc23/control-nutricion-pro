@@ -1,4 +1,16 @@
 .dashboard {
+  --dashboard-text-primary: #f5f5f7;
+  --dashboard-text-secondary: #d0d1d5;
+  --dashboard-text-muted: #92949b;
+  --dashboard-type-small: 0.78rem;
+  --dashboard-type-base: 0.92rem;
+  --dashboard-type-large: 1.2rem;
+  --summary-text-primary: var(--dashboard-text-primary);
+  --summary-text-secondary: var(--dashboard-text-secondary);
+  --summary-text-muted: var(--dashboard-text-muted);
+  --summary-type-small: var(--dashboard-type-small);
+  --summary-type-base: var(--dashboard-type-base);
+  --summary-type-value: var(--dashboard-type-large);
   display: grid;
   gap: 18px;
   animation: fadeIn 0.3s ease;
@@ -23,14 +35,14 @@
 .summary-topline h2,
 .calendar-modal-header h2 {
   margin: 3px 0 0;
-  color: #f5f5f7;
-  font-size: 1.45rem;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-type-large);
   text-transform: capitalize;
 }
 
 .eyebrow {
-  color: #92949b;
-  font-size: 0.68rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
   font-weight: 700;
 }
 
@@ -42,7 +54,7 @@
   border: 1px solid #30333a;
   border-radius: 14px;
   background: #191b20;
-  color: #f5f5f7;
+  color: var(--dashboard-text-primary);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -80,14 +92,14 @@
   border: 1px solid transparent;
   border-radius: 14px;
   background: transparent;
-  color: #a4a6ad;
+  color: var(--dashboard-text-muted);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .week-day.is-selected {
   background: #29212a;
-  color: #fff;
+  color: var(--dashboard-text-primary);
 }
 
 .week-day.is-today .week-day-ring {
@@ -95,7 +107,7 @@
 }
 
 .week-day-name {
-  font-size: 0.72rem;
+  font-size: var(--dashboard-type-small);
   font-weight: 700;
 }
 
@@ -165,17 +177,21 @@
 }
 
 .macro-card-label,
-.calories-heading > div > span:first-child {
-  color: #d0d1d5;
-  font-size: 0.92rem;
+.calories-heading > div > span:first-child,
+.creatine-tile > span,
+.burned-tile > .burned-tile-label,
+.meals-section-toggle strong,
+.monthly-summary summary {
+  color: var(--summary-text-secondary);
+  font-size: var(--summary-type-base);
   font-weight: 600;
 }
 
 .macro-card-copy > strong,
 .calories-heading strong {
   overflow: hidden;
-  color: #f5f5f7;
-  font-size: clamp(1.18rem, 5vw, 1.7rem);
+  color: var(--summary-text-primary);
+  font-size: var(--summary-type-value);
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -183,16 +199,16 @@
 
 .macro-card-copy > strong small,
 .calories-heading strong small {
-  color: #a4a6ad;
-  font-size: 0.78rem;
+  color: var(--summary-text-muted);
+  font-size: var(--summary-type-small);
   font-weight: 500;
 }
 
 .macro-card-remaining,
 .calories-heading > div > .calories-remaining {
   min-height: 1em;
-  color: #92949b;
-  font-size: 0.78rem;
+  color: var(--summary-text-muted);
+  font-size: var(--summary-type-small);
 }
 
 .macro-card-progress,
@@ -222,7 +238,7 @@
   align-self: start;
   margin: 0;
   color: var(--macro-color);
-  font-size: 0.84rem;
+  font-size: var(--summary-type-small);
   line-height: 1;
   font-weight: 700;
 }
@@ -299,8 +315,8 @@
   border: 1px solid #292c33;
   border-radius: 17px;
   background: #17191e;
-  color: #a4a6ad;
-  font-size: 0.78rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
   font-weight: 600;
 }
 
@@ -339,15 +355,15 @@
   border-bottom: 1px dashed #686b74;
   border-radius: 0;
   background: transparent;
-  color: #f5f5f7;
-  font-size: 1.1rem;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-type-large);
   font-weight: 700;
 }
 
 .burned-input-unit {
   flex: 0 0 auto;
-  color: #92949b;
-  font-size: 0.72rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
   font-weight: 600;
 }
 
@@ -357,8 +373,8 @@
 }
 
 .burned-tile input::placeholder {
-  color: #62656d;
-  font-size: 0.9rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-base);
   font-weight: 500;
 }
 
@@ -371,7 +387,7 @@
   padding: 16px;
   border: 0;
   background: transparent;
-  color: #f5f5f7;
+  color: var(--dashboard-text-primary);
   text-align: left;
   cursor: pointer;
 }
@@ -381,21 +397,20 @@
   gap: 4px;
 }
 
-.meals-section-toggle strong {
-  font-size: 0.94rem;
-}
-
 .meals-section-toggle small {
-  color: #92949b;
-  font-size: 0.75rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
 }
 
-.meals-section-toggle > svg {
-  color: #8e9199;
+.meals-section-toggle > svg,
+.monthly-summary summary > svg {
+  flex: 0 0 auto;
+  color: var(--dashboard-text-muted);
   transition: transform 0.2s ease;
 }
 
-.meals-section-toggle > svg.is-expanded {
+.meals-section-toggle > svg.is-expanded,
+.monthly-summary[open] summary > svg {
   transform: rotate(90deg);
 }
 
@@ -413,8 +428,8 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  color: #d0d1d5;
-  font-size: 0.7rem;
+  color: var(--dashboard-text-secondary);
+  font-size: var(--dashboard-type-small);
 }
 
 .summary-meals-table th,
@@ -430,8 +445,8 @@
 }
 
 .summary-meals-table th {
-  color: #d0d1d5;
-  font-size: 0.65rem;
+  color: var(--dashboard-text-secondary);
+  font-size: var(--dashboard-type-small);
   font-weight: 600;
 }
 
@@ -495,8 +510,8 @@
 
 .empty-day-message {
   padding: 18px 0;
-  color: #92949b;
-  font-size: 0.85rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-base);
 }
 
 .add-extra-toggle,
@@ -510,8 +525,8 @@
   border: 1px solid #383b43;
   border-radius: 11px;
   background: #22252c;
-  color: #f5f5f7;
-  font-size: 0.8rem;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-type-base);
   font-weight: 600;
   cursor: pointer;
 }
@@ -534,8 +549,8 @@
   display: grid;
   min-width: 0;
   gap: 5px;
-  color: #a4a6ad;
-  font-size: 0.75rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
 }
 
 .extra-form-grid input {
@@ -546,7 +561,7 @@
   border: 1px solid #393c44;
   border-radius: 9px;
   background: #101216;
-  color: #f5f5f7;
+  color: var(--dashboard-text-primary);
 }
 
 .save-extra-button {
@@ -561,11 +576,16 @@
 }
 
 .monthly-summary summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 15px 16px;
-  color: #e5e5e7;
-  font-size: 0.86rem;
-  font-weight: 600;
   cursor: pointer;
+  list-style: none;
+}
+
+.monthly-summary summary::-webkit-details-marker {
+  display: none;
 }
 
 .monthly-summary-grid {
@@ -585,14 +605,14 @@
 }
 
 .monthly-stat span {
-  color: #92949b;
-  font-size: 0.7rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
 }
 
 .monthly-stat strong {
   overflow-wrap: anywhere;
-  color: #f5f5f7;
-  font-size: 0.95rem;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-type-base);
 }
 
 .add-meal-fab {
@@ -606,9 +626,9 @@
   border: 0;
   border-radius: 16px;
   background: #ff375f;
-  color: white;
+  color: var(--dashboard-text-primary);
   box-shadow: 0 8px 24px rgba(255, 55, 95, 0.2);
-  font-size: 0.88rem;
+  font-size: var(--dashboard-type-base);
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
@@ -649,13 +669,13 @@
 }
 
 .calendar-modal-header h2 {
-  font-size: 1.35rem;
+  font-size: var(--dashboard-type-large);
 }
 
 .calendar-month-controls {
   margin-bottom: 15px;
-  color: #f5f5f7;
-  font-size: 0.9rem;
+  color: var(--dashboard-text-primary);
+  font-size: var(--dashboard-type-base);
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -675,8 +695,8 @@
   display: grid;
   height: 28px;
   place-items: center;
-  color: #8e9199;
-  font-size: 0.72rem;
+  color: var(--dashboard-text-muted);
+  font-size: var(--dashboard-type-small);
   font-weight: 700;
 }
 
@@ -697,15 +717,15 @@
   border: 1px solid transparent;
   border-radius: 14px;
   background: transparent;
-  color: #d0d1d5;
-  font-size: 0.76rem;
+  color: var(--dashboard-text-secondary);
+  font-size: var(--dashboard-type-small);
   cursor: pointer;
 }
 
 .calendar-day.is-selected {
   border-color: rgba(255, 55, 95, 0.7);
   background: rgba(255, 55, 95, 0.1);
-  color: white;
+  color: var(--dashboard-text-primary);
 }
 
 .calendar-day.is-today:not(.is-selected) {
@@ -716,7 +736,7 @@
   position: relative;
   z-index: 2;
   flex: 0 0 12px;
-  color: #f5f5f7;
+  color: var(--dashboard-text-primary);
   font-weight: 700;
   line-height: 12px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
