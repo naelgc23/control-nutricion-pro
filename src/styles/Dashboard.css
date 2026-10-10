@@ -5,7 +5,6 @@
 }
 
 .summary-topline,
-.section-heading,
 .calories-heading,
 .calendar-modal-header,
 .calendar-month-controls,
@@ -134,33 +133,20 @@
   min-width: 0;
 }
 
-.section-heading {
-  margin-bottom: 11px;
-}
-
-.section-heading h3 {
-  margin: 0;
-  color: #f5f5f7;
-  font-size: 1rem;
-}
-
-.section-heading > span {
-  color: #92949b;
-  font-size: 0.76rem;
-  text-transform: capitalize;
-}
-
 .macro-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 18px;
 }
 
 .macro-card {
   position: relative;
   display: flex;
   min-width: 0;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1.4 / 1;
+  min-height: 132px;
+  max-height: 176px;
   flex-direction: column;
   justify-content: flex-start;
   gap: 12px;
@@ -172,39 +158,45 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.17);
 }
 
-.macro-card-copy {
+.macro-card-copy,
+.calories-heading > div {
   display: grid;
   gap: 4px;
 }
 
-.macro-card-label {
+.macro-card-label,
+.calories-heading > div > span:first-child {
   color: #d0d1d5;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   font-weight: 600;
 }
 
-.macro-card-copy > strong {
+.macro-card-copy > strong,
+.calories-heading strong {
   overflow: hidden;
   color: #f5f5f7;
-  font-size: clamp(1.05rem, 4.5vw, 1.55rem);
+  font-size: clamp(1.18rem, 5vw, 1.7rem);
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.macro-card-copy > strong small {
+.macro-card-copy > strong small,
+.calories-heading strong small {
   color: #a4a6ad;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 500;
 }
 
-.macro-card-remaining {
+.macro-card-remaining,
+.calories-heading > div > .calories-remaining {
   min-height: 1em;
   color: #92949b;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
-.macro-card-progress {
+.macro-card-progress,
+.calories-progress {
   display: grid;
   gap: 4px;
 }
@@ -224,10 +216,14 @@
   transition: width 0.4s ease;
 }
 
-.macro-card-percent {
-  align-self: flex-end;
+.macro-card-percent,
+.calories-percent {
+  justify-self: start;
+  align-self: start;
+  margin: 0;
   color: var(--macro-color);
-  font-size: 0.78rem;
+  font-size: 0.84rem;
+  line-height: 1;
   font-weight: 700;
 }
 
@@ -253,44 +249,18 @@
 }
 
 .calories-card {
-  padding: 16px;
-}
-
-.calories-heading > div {
-  display: grid;
-  gap: 5px;
-}
-
-.calories-heading > div > span {
-  color: #a4a6ad;
-  font-size: 0.78rem;
-}
-
-.calories-heading > div > .calories-remaining {
-  color: #92949b;
-  font-size: 0.75rem;
-}
-
-.calories-heading strong {
-  color: #f5f5f7;
-  font-size: 1.15rem;
-}
-
-.calories-heading strong small {
-  color: #92949b;
-  font-size: 0.78rem;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: clamp(13px, 4vw, 20px);
 }
 
 .calories-percent {
   color: #64d2ff;
-  font-size: 0.82rem;
-  font-weight: 700;
 }
 
 .calories-track {
-  height: 7px;
-  margin-top: 14px;
+  height: 6px;
   overflow: hidden;
   border-radius: 999px;
   background: #33363d;
@@ -766,7 +736,8 @@
   }
 
   .macro-grid {
-    gap: 9px;
+    column-gap: 9px;
+    row-gap: 15px;
   }
 
   .macro-card {

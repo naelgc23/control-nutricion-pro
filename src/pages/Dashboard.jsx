@@ -317,18 +317,16 @@ function Dashboard({
               {remainingText(selectedTotals.kcal, Number(goals.calories) || 0, 'kcal')}
             </span>
           </div>
-          <span className="calories-percent">{Math.round(caloriesPercentage)}%</span>
         </div>
-        <div className="calories-track">
-          <span style={{ width: `${caloriesProgress}%` }} />
+        <div className="calories-progress">
+          <div className="calories-track">
+            <span style={{ width: `${caloriesProgress}%` }} />
+          </div>
+          <span className="calories-percent">{Math.round(caloriesPercentage)}%</span>
         </div>
       </section>
 
       <section className="daily-macros-section">
-        <div className="section-heading">
-          <h3>Macros</h3>
-          <span>{selectedDateLabel}</span>
-        </div>
         <div className="macro-grid">
           {MACROS.map(macro => {
             const target = Number(goals[macro.key]) || 0;
