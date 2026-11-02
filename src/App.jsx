@@ -48,7 +48,7 @@ function App() {
     <div className="app app-dark" ref={appRef}>
       <header className="app-header">
         <div className="brand-lockup">
-          <img className="brand-mark" src="/nutrack-mark.svg" alt="" />
+          <img className="brand-mark" src="/nutrack-mark.png" alt="" />
           <h1>Nutrack</h1>
         </div>
         <div className="app-version">v{APP_VERSION}</div>

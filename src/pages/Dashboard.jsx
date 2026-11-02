@@ -10,10 +10,10 @@ import {
 import '../styles/Dashboard.css';
 
 const MACROS = [
-  { key: 'protein', label: 'Proteínas', color: '#ff375f', rgb: '255, 55, 95' },
-  { key: 'fats', label: 'Grasas', color: '#ffd60a', rgb: '255, 214, 10' },
-  { key: 'carbs', label: 'Carbohidratos', color: '#64d2ff', rgb: '100, 210, 255' },
-  { key: 'fiber', label: 'Fibra', color: '#30d158', rgb: '48, 209, 88' }
+  { key: 'protein', label: 'Proteínas', color: '#ff375f', rgb: '255, 55, 95', progressColor: '#5CCBFF' },
+  { key: 'fats', label: 'Grasas', color: '#ffd60a', rgb: '255, 214, 10', progressColor: '#FFE600' },
+  { key: 'carbs', label: 'Carbohidratos', color: '#64d2ff', rgb: '100, 210, 255', progressColor: '#F472B6' },
+  { key: 'fiber', label: 'Fibra', color: '#30d158', rgb: '48, 209, 88', progressColor: '#00E65B' }
 ];
 
 const EXTRA_FIELDS = [
@@ -63,31 +63,65 @@ function isExtra(consumption) {
 }
 
 function MacroRings({ totals, goals, className = '' }) {
-  const radii = [14, 10.5, 7, 3.5];
+  const radius = 16;
+  const circumference = 2 * Math.PI * radius;
+  const segmentLength = circumference * (50 / 360);
+  const calorieGoal = Number(goals.calories) || 0;
+  const calorieTotal = Math.round(totals.kcal);
+  const caloriePercentage = calorieGoal > 0 ? (totals.kcal / calorieGoal) * 100 : 0;
+  const calorieProgress = Math.min(Math.max(caloriePercentage / 100, 0), 1);
+  const ringSegments = [
+    { key: 'calories', progressColor: '#9B3DFF', progress: calorieProgress },
+    ...MACROS.map(macro => {
+      const goal = Number(goals[macro.key]) || 0;
+      const progress = goal > 0
+        ? Math.min(Math.max((totals[macro.key] || 0) / goal, 0), 1)
+        : 0;
+
+      return { key: macro.key, progressColor: macro.progressColor, progress };
+    })
+  ];
 
   return (
-    <svg className={`macro-rings ${className}`} viewBox="0 0 32 32" aria-hidden="true">
-      {MACROS.map((macro, index) => {
-        const radius = radii[index];
-        const circumference = 2 * Math.PI * radius;
-        const goal = Number(goals[macro.key]) || 0;
-        const progress = goal > 0 ? Math.min(Math.max((totals[macro.key] || 0) / goal, 0), 1) : 0;
+    <svg className={`macro-rings ${className}`} viewBox="0 0 40 40" aria-hidden="true">
+      {ringSegments.map((segment, index) => {
+        const segmentStart = index * 72 - 25;
+        const dashOffset = -circumference * ((segmentStart + 360) % 360) / 360;
 
         return (
-          <g key={macro.key}>
-            <circle className="ring-track" cx="16" cy="16" r={radius} />
+          <g key={segment.key}>
+            <circle
+              className="ring-track"
+              cx="20"
+              cy="20"
+              r={radius}
+              strokeDasharray={`${segmentLength} ${circumference - segmentLength}`}
+              strokeDashoffset={dashOffset}
+              transform="rotate(-90 20 20)"
+            />
             <circle
               className="ring-progress"
-              cx="16"
-              cy="16"
+              cx="20"
+              cy="20"
               r={radius}
-              stroke={macro.color}
-              strokeDasharray={`${circumference * progress} ${circumference}`}
-              transform="rotate(-90 16 16)"
+              stroke={segment.progressColor}
+              strokeDasharray={`${segmentLength * segment.progress} ${circumference - segmentLength * segment.progress}`}
+              strokeDashoffset={dashOffset}
+              transform="rotate(-90 20 20)"
             />
           </g>
         );
       })}
+      <text
+        className="calorie-ring-label"
+        x="20"
+        y="20"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={calorieTotal >= 10000 ? 6 : calorieTotal >= 1000 ? 7.5 : 9}
+      >
+        {calorieTotal}
+      </text>
     </svg>
   );
 }
@@ -373,7 +407,11 @@ function Dashboard({
               <article
                 className={`macro-card ${progressPercentage > 100 ? 'is-over-target' : ''}`}
                 key={macro.key}
-                style={{ '--macro-color': macro.color, '--macro-rgb': macro.rgb }}
+                style={{
+                  '--macro-color': macro.color,
+                  '--macro-rgb': macro.rgb,
+                  '--macro-progress-color': macro.progressColor
+                }}
               >
                 <div className="macro-card-copy">
                   <span className="macro-card-label">{macro.label}</span>

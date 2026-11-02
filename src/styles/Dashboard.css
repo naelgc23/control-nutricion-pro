@@ -166,7 +166,7 @@
 .ring-track,
 .ring-progress {
   fill: none;
-  stroke-width: 1.8;
+  stroke-width: 3.8;
 }
 
 .ring-track {
@@ -175,6 +175,13 @@
 
 .ring-progress {
   stroke-linecap: round;
+}
+
+.calorie-ring-label {
+  fill: var(--dashboard-text-primary);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: -0.35px;
 }
 
 .daily-macros-section,
@@ -265,7 +272,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--macro-color);
+  background: var(--macro-progress-color);
   transition: width 0.4s ease;
 }
 
@@ -274,7 +281,7 @@
   justify-self: start;
   align-self: start;
   margin: 0;
-  color: var(--macro-color);
+  color: var(--macro-progress-color);
   font-size: var(--summary-type-small);
   line-height: 1;
   font-weight: 700;
@@ -309,7 +316,7 @@
 }
 
 .calories-percent {
-  color: #64d2ff;
+  color: #9B3DFF;
 }
 
 .calories-track {
@@ -323,7 +330,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #64d2ff;
+  background: #9B3DFF;
   transition: width 0.4s ease;
 }
 
