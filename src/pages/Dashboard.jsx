@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import {
   Calendar,
   ChevronLeft,
@@ -43,6 +44,14 @@ function parseDateKey(dateKey) {
 function formatMonthYear(date) {
   const month = date.toLocaleDateString('es-ES', { month: 'long' });
   return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${date.getFullYear()}`;
+}
+
+function formatDateLabel(dateKey) {
+  return parseDateKey(dateKey).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 }
 
 function formatAmount(value) {
@@ -136,6 +145,10 @@ function Dashboard({
 }) {
   const today = toDateKey(new Date());
   const [selectedDate, setSelectedDate] = useState(today);
+  const [averageStartDate, setAverageStartDate] = useState(`${today.slice(0, 7)}-01`);
+  const [averageEndDate, setAverageEndDate] = useState(today);
+  const [customAverageRange, setCustomAverageRange] = useState(false);
+  const [pdfError, setPdfError] = useState('');
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(today.slice(0, 7));
   const [mealsExpanded, setMealsExpanded] = useState(false);
@@ -261,6 +274,203 @@ function Dashboard({
         : null
     };
   }, [dailyRecords, selectedMonthKey, totalsByDate]);
+
+  const intervalStats = useMemo(() => {
+    const intervalDates = Object.keys(totalsByDate).filter(date => (
+      date >= averageStartDate && date <= averageEndDate
+    ));
+    const intervalRecords = Object.entries(dailyRecords || {}).filter(([date]) => (
+      date >= averageStartDate && date <= averageEndDate
+    ));
+    const burnedCalories = intervalRecords
+      .map(([, record]) => record?.burnedCalories)
+      .filter(value => (
+        value !== '' && value !== null && value !== undefined && Number.isFinite(Number(value))
+      ))
+      .map(Number);
+    const totals = intervalDates.reduce((sum, date) => {
+      Object.keys(EMPTY_TOTALS).forEach(key => {
+        sum[key] += totalsByDate[date][key];
+      });
+      return sum;
+    }, { ...EMPTY_TOTALS });
+    const days = intervalDates.length || 1;
+
+    return {
+      loggedDays: intervalDates.length,
+      averageKcal: Math.round(totals.kcal / days),
+      averageProtein: Math.round(totals.protein / days),
+      averageFats: Math.round(totals.fats / days),
+      averageCarbs: Math.round(totals.carbs / days),
+      averageFiber: Math.round(totals.fiber / days),
+      creatineDays: intervalRecords.filter(([, record]) => record?.creatineTaken).length,
+      averageBurned: burnedCalories.length
+        ? Math.round(burnedCalories.reduce((sum, value) => sum + value, 0) / burnedCalories.length)
+        : null
+    };
+  }, [averageEndDate, averageStartDate, dailyRecords, totalsByDate]);
+  const invalidAverageRange = (
+    !averageStartDate ||
+    !averageEndDate ||
+    averageStartDate > averageEndDate
+  );
+  const displayedStats = customAverageRange ? intervalStats : monthlyStats;
+
+  const downloadIntervalPdf = async () => {
+    if (invalidAverageRange) return;
+
+    setCustomAverageRange(true);
+    setPdfError('');
+    try {
+      const { jsPDF } = await import('jspdf');
+      const pdf = new jsPDF({ orientation: 'landscape' });
+      const rows = [
+        ['Días registrados', String(intervalStats.loggedDays)],
+        ['Promedio kcal consumidas', `${intervalStats.averageKcal} kcal`],
+        ['Promedio proteína', `${intervalStats.averageProtein} g`],
+        ['Promedio grasas', `${intervalStats.averageFats} g`],
+        ['Promedio hidratos', `${intervalStats.averageCarbs} g`],
+        ['Promedio fibra', `${intervalStats.averageFiber} g`],
+        ['Días con creatina', String(intervalStats.creatineDays)],
+        ['Promedio kcal quemadas', intervalStats.averageBurned === null
+          ? 'Sin datos'
+          : `${intervalStats.averageBurned} kcal`]
+      ];
+      const dailyRowsByMonth = new Map();
+      const intervalDate = parseDateKey(averageStartDate);
+      const intervalLastDate = parseDateKey(averageEndDate);
+      while (intervalDate <= intervalLastDate) {
+        const date = toDateKey(intervalDate);
+        const totals = totalsByDate[date] || EMPTY_TOTALS;
+        const record = dailyRecords?.[date];
+        const burnedCalories = record?.burnedCalories;
+        const monthKey = date.slice(0, 7);
+        const monthRows = dailyRowsByMonth.get(monthKey) || [];
+        monthRows.push([
+          formatDateLabel(date),
+          String(Math.round(totals.kcal)),
+          formatAmount(totals.protein),
+          formatAmount(totals.fats),
+          formatAmount(totals.carbs),
+          formatAmount(totals.fiber),
+          record?.creatineTaken ? 'Sí' : 'No',
+          burnedCalories === '' || burnedCalories == null || !Number.isFinite(Number(burnedCalories))
+            ? '—'
+            : String(Math.round(Number(burnedCalories)))
+        ]);
+        dailyRowsByMonth.set(monthKey, monthRows);
+        intervalDate.setDate(intervalDate.getDate() + 1);
+      }
+
+      const tableHeaders = [
+          'Fecha',
+          'Kcal ing.',
+          'Prot. (g)',
+          'Grasas (g)',
+          'Hidr. (g)',
+          'Fibra (g)',
+          'Creatina',
+          'Kcal quem.'
+      ];
+      const columnWidths = [36, 34, 32, 32, 32, 26, 34, 39];
+      const tableX = 16;
+      const headerHeight = 5;
+      const rowHeight = 4.5;
+      const drawTable = (dailyRows, tableStartY) => {
+        let tableY = tableStartY;
+        const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+        pdf.setFillColor(38, 41, 48);
+        pdf.rect(tableX, tableY, tableWidth, headerHeight, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(7);
+        pdf.setTextColor(255, 255, 255);
+        let x = tableX;
+        tableHeaders.forEach((header, index) => {
+          pdf.text(header, x + columnWidths[index] / 2, tableY + 3.5, { align: 'center' });
+          x += columnWidths[index];
+        });
+        pdf.setTextColor(0, 0, 0);
+        tableY += headerHeight;
+
+        dailyRows.forEach((dailyRow, rowIndex) => {
+          if (rowIndex % 2 === 1) {
+            pdf.setFillColor(243, 244, 246);
+            pdf.rect(tableX, tableY, tableWidth, rowHeight, 'F');
+          }
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(7);
+          let cellX = tableX;
+          dailyRow.forEach((value, columnIndex) => {
+            pdf.text(value, cellX + columnWidths[columnIndex] / 2, tableY + 3.1, { align: 'center' });
+            cellX += columnWidths[columnIndex];
+          });
+          tableY += rowHeight;
+        });
+
+      };
+
+      [...dailyRowsByMonth.entries()].forEach(([monthKey, dailyRows], monthIndex) => {
+        if (monthIndex > 0) pdf.addPage('a4', 'landscape');
+
+        const monthLabel = formatMonthYear(parseDateKey(`${monthKey}-01`));
+        if (monthIndex === 0) {
+          pdf.setFontSize(15);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Resumen nutricional', tableX, 10);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`Intervalo: ${formatDateLabel(averageStartDate)} - ${formatDateLabel(averageEndDate)}`, tableX, 16);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text('Resumen del intervalo', tableX, 24);
+
+          rows.forEach(([label, value], index) => {
+            const column = index % 4;
+            const row = Math.floor(index / 4);
+            const x = tableX + column * 66;
+            const y = 31 + row * 5;
+            pdf.setFontSize(7);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(label, x, y);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(value, x + 62, y, { align: 'right' });
+          });
+        }
+
+        const monthTitleY = monthIndex === 0 ? 43 : 14;
+        const tableStartY = monthIndex === 0 ? 47 : 19;
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Detalle diario — ${monthLabel}`, tableX, monthTitleY);
+        drawTable(dailyRows, tableStartY);
+      });
+
+      const fileName = `resumen-nutricional-${averageStartDate}-${averageEndDate}-${Date.now()}.pdf`;
+      if (Capacitor.isNativePlatform()) {
+        const [{ Directory, Filesystem }, { Share }] = await Promise.all([
+          import('@capacitor/filesystem'),
+          import('@capacitor/share')
+        ]);
+        const base64Pdf = pdf.output('datauristring').split(',')[1];
+        const { uri } = await Filesystem.writeFile({
+          path: fileName,
+          data: base64Pdf,
+          directory: Directory.Cache
+        });
+        await Share.share({
+          title: 'Resumen nutricional',
+          text: `Resumen del ${formatDateLabel(averageStartDate)} al ${formatDateLabel(averageEndDate)}`,
+          files: [uri],
+          dialogTitle: 'Guardar o compartir resumen'
+        });
+      } else {
+        pdf.save(fileName);
+      }
+    } catch (error) {
+      console.error('No se pudo generar el PDF del resumen nutricional.', error);
+      setPdfError('No se pudo generar el PDF. Inténtalo de nuevo.');
+    }
+  };
 
   const monthGridLabel = formatMonthYear(parseDateKey(`${calendarMonth}-01`));
 
@@ -570,19 +780,69 @@ function Dashboard({
 
       <details className="monthly-summary">
         <summary>
-          <span>Resumen de {selectedMonthLabel}</span>
+          <span>
+            {customAverageRange
+              ? `Resumen del ${formatDateLabel(averageStartDate)} al ${formatDateLabel(averageEndDate)}`
+              : `Resumen de ${selectedMonthLabel}`}
+          </span>
           <ChevronRight size={18} aria-hidden="true" />
         </summary>
-        <div className="monthly-summary-grid">
-          <MonthlyStat label="Días registrados" value={monthlyStats.loggedDays} />
-          <MonthlyStat label="Promedio kcal" value={monthlyStats.averageKcal} />
-          <MonthlyStat label="Promedio proteína" value={`${monthlyStats.averageProtein} g`} />
-          <MonthlyStat label="Promedio grasas" value={`${monthlyStats.averageFats} g`} />
-          <MonthlyStat label="Promedio hidratos" value={`${monthlyStats.averageCarbs} g`} />
-          <MonthlyStat label="Promedio fibra" value={`${monthlyStats.averageFiber} g`} />
-          <MonthlyStat label="Días con creatina" value={monthlyStats.creatineDays} />
-          <MonthlyStat label="Promedio kcal quemadas" value={monthlyStats.averageBurned === null ? '—' : `${monthlyStats.averageBurned} kcal`} />
+        <div className="monthly-range-controls">
+          <label>
+            <span>Desde</span>
+            <input
+              type="date"
+              value={averageStartDate}
+              max={averageEndDate || today}
+              onChange={event => {
+                setCustomAverageRange(true);
+                setAverageStartDate(event.target.value);
+              }}
+            />
+          </label>
+          <label>
+            <span>Hasta</span>
+            <input
+              type="date"
+              value={averageEndDate}
+              min={averageStartDate || undefined}
+              max={today}
+              onChange={event => {
+                setCustomAverageRange(true);
+                setAverageEndDate(event.target.value);
+              }}
+            />
+          </label>
         </div>
+        {customAverageRange && !invalidAverageRange && (
+          <p className="interval-range-label">
+            {formatDateLabel(averageStartDate)} – {formatDateLabel(averageEndDate)}
+          </p>
+        )}
+        {invalidAverageRange && (
+          <p className="interval-range-error" role="alert">
+            Selecciona un intervalo válido: la fecha inicial debe ser anterior o igual a la final.
+          </p>
+        )}
+        <div className="monthly-summary-grid">
+          <MonthlyStat label="Días registrados" value={displayedStats.loggedDays} />
+          <MonthlyStat label="Promedio kcal" value={displayedStats.averageKcal} />
+          <MonthlyStat label="Promedio proteína" value={`${displayedStats.averageProtein} g`} />
+          <MonthlyStat label="Promedio grasas" value={`${displayedStats.averageFats} g`} />
+          <MonthlyStat label="Promedio hidratos" value={`${displayedStats.averageCarbs} g`} />
+          <MonthlyStat label="Promedio fibra" value={`${displayedStats.averageFiber} g`} />
+          <MonthlyStat label="Días con creatina" value={displayedStats.creatineDays} />
+          <MonthlyStat label="Promedio kcal quemadas" value={displayedStats.averageBurned === null ? '—' : `${displayedStats.averageBurned} kcal`} />
+        </div>
+        <button
+          type="button"
+          className="download-summary-button"
+          onClick={downloadIntervalPdf}
+          disabled={invalidAverageRange}
+        >
+          Descargar PDF
+        </button>
+        {pdfError && <p className="interval-range-error" role="alert">{pdfError}</p>}
       </details>
 
       {calendarOpen && (

@@ -1,7 +1,7 @@
 {
   "name": "control-nutricion-pro",
   "private": true,
-  "version": "2.2.8",
+  "version": "2.3.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,9 @@
     "open:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/filesystem": "^5.2.2",
+    "@capacitor/share": "^5.0.8",
+    "jspdf": "^4.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.2",

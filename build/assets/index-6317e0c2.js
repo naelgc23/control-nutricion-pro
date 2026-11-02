@@ -1,0 +1,1 @@
+import{r as e,b as r}from"./index-cee30f69.js";import"./vendor-c3f0f46a.js";const o=e("Share",{web:()=>r(()=>import("./web-91b7ceba.js"),["assets/web-91b7ceba.js","assets/index-cee30f69.js","assets/vendor-c3f0f46a.js","assets/index-4b9a96fb.css"]).then(e=>new e.ShareWeb)});export{o as Share};
