@@ -168,17 +168,21 @@ function Dashboard({
   const selectedMeals = consumptions.filter(consumption => consumption.date === selectedDate);
   const extraConsumptions = selectedMeals.filter(isExtra);
   const mealTotals = selectedMeals.filter(consumption => !isExtra(consumption)).reduce((totals, consumption) => {
-    const mealName = consumption.meal;
-    const mealTotalsForType = totals[mealName] || { ...EMPTY_TOTALS };
+    const customDishName = consumption.meal === 'Plato libre'
+      ? consumption.foodName?.trim()
+      : '';
+    const mealName = customDishName || consumption.meal;
+    const mealKey = customDishName ? `dish:${customDishName}` : `type:${consumption.meal}`;
+    const mealTotalsForType = totals[mealKey] || { mealName, ...EMPTY_TOTALS };
     Object.keys(EMPTY_TOTALS).forEach(key => {
       mealTotalsForType[key] += Number(consumption[key]) || 0;
     });
-    totals[mealName] = mealTotalsForType;
+    totals[mealKey] = mealTotalsForType;
     return totals;
   }, {});
   const mealRows = [
-    ...Object.entries(mealTotals).map(([mealName, totals]) => ({
-      id: `meal-${mealName}`,
+    ...Object.entries(mealTotals).map(([mealKey, { mealName, ...totals }]) => ({
+      id: `meal-${mealKey}`,
       mealName,
       totals,
       isExtra: false

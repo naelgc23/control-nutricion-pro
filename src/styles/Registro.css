@@ -37,6 +37,28 @@
   font-size: 1.5em;
 }
 
+.custom-meal-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.custom-meal-fields > .form-group,
+.custom-macros-grid .form-group {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.custom-macros-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.custom-macros-grid .form-group label {
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+}
+
 /* React Select Custom Styles */
 .react-select__control {
   border: 2px solid #e2e8f0 !important;

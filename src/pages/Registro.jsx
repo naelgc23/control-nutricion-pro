@@ -241,27 +241,29 @@ export default function Registro({ foods, consumptions, setConsumptions }) {
               maxLength="60"
             />
           </div>
-          {customMacroFields.map(({ key, label, step }) => (
-            <div className="form-group" key={key}>
-              <label htmlFor={`custom-${key}`}>{label}</label>
-              <input
-                id={`custom-${key}`}
-                className={validationErrors.includes(label) ? 'field-invalid' : ''}
-                type="number"
-                value={customMacros[key]}
-                aria-invalid={validationErrors.includes(label)}
-                onChange={(e) => {
-                  setCustomMacros(prev => ({ ...prev, [key]: e.target.value }))
-                  if (e.target.value !== '' && Number.isFinite(Number(e.target.value)) && Number(e.target.value) >= 0) {
-                    clearValidationError(label)
-                  }
-                }}
-                min="0"
-                step={step}
-                onWheel={(e) => e.currentTarget.blur()}
-              />
-            </div>
-          ))}
+          <div className="custom-macros-grid">
+            {customMacroFields.map(({ key, label, step }) => (
+              <div className="form-group" key={key}>
+                <label htmlFor={`custom-${key}`}>{label}</label>
+                <input
+                  id={`custom-${key}`}
+                  className={validationErrors.includes(label) ? 'field-invalid' : ''}
+                  type="number"
+                  value={customMacros[key]}
+                  aria-invalid={validationErrors.includes(label)}
+                  onChange={(e) => {
+                    setCustomMacros(prev => ({ ...prev, [key]: e.target.value }))
+                    if (e.target.value !== '' && Number.isFinite(Number(e.target.value)) && Number(e.target.value) >= 0) {
+                      clearValidationError(label)
+                    }
+                  }}
+                  min="0"
+                  step={step}
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <>
