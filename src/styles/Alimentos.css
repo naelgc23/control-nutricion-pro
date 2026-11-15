@@ -343,13 +343,23 @@
 
 .modal-actions {
   display: flex;
+  align-items: center;
   gap: 10px;
   margin-top: 25px;
 }
 
 .modal-actions button {
+  display: flex;
   flex: 1;
-  padding: 12px;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 0;
+  flex-shrink: 0;
+  height: 48px;
+  margin: 0;
+  padding: 0 12px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -363,17 +373,19 @@
   color: white;
 }
 
-.modal-actions .btn-primary:hover {
+.alimentos .modal-actions .btn-primary:hover {
   background: #5568d3;
+  transform: none;
+}
+
+.alimentos .modal-actions .btn-secondary:hover {
+  background: #cbd5e0;
+  transform: none;
 }
 
 .modal-actions .btn-secondary {
   background: #e2e8f0;
   color: #2d3748;
-}
-
-.modal-actions .btn-secondary:hover {
-  background: #cbd5e0;
 }
 
 .empty-message {

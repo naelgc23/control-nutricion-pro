@@ -144,9 +144,12 @@ function Dashboard({
   navigateToTab
 }) {
   const today = toDateKey(new Date());
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = toDateKey(yesterdayDate);
   const [selectedDate, setSelectedDate] = useState(today);
-  const [averageStartDate, setAverageStartDate] = useState(`${today.slice(0, 7)}-01`);
-  const [averageEndDate, setAverageEndDate] = useState(today);
+  const [averageStartDate, setAverageStartDate] = useState('');
+  const [averageEndDate, setAverageEndDate] = useState('');
   const [customAverageRange, setCustomAverageRange] = useState(false);
   const [pdfError, setPdfError] = useState('');
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -312,7 +315,9 @@ function Dashboard({
   const invalidAverageRange = (
     !averageStartDate ||
     !averageEndDate ||
-    averageStartDate > averageEndDate
+    averageStartDate > averageEndDate ||
+    averageStartDate > yesterday ||
+    averageEndDate > yesterday
   );
   const displayedStats = customAverageRange ? intervalStats : monthlyStats;
 
@@ -457,9 +462,15 @@ function Dashboard({
           data: base64Pdf,
           directory: Directory.Cache
         });
+        const fileInfo = await Filesystem.stat({
+          path: fileName,
+          directory: Directory.Cache
+        });
+        if (fileInfo.size === 0) {
+          throw new Error('El archivo PDF generado está vacío.');
+        }
         await Share.share({
           title: 'Resumen nutricional',
-          text: `Resumen del ${formatDateLabel(averageStartDate)} al ${formatDateLabel(averageEndDate)}`,
           files: [uri],
           dialogTitle: 'Guardar o compartir resumen'
         });
@@ -782,7 +793,9 @@ function Dashboard({
         <summary>
           <span>
             {customAverageRange
-              ? `Resumen del ${formatDateLabel(averageStartDate)} al ${formatDateLabel(averageEndDate)}`
+              ? averageStartDate && averageEndDate
+                ? `Resumen del ${formatDateLabel(averageStartDate)} al ${formatDateLabel(averageEndDate)}`
+                : 'Resumen del intervalo'
               : `Resumen de ${selectedMonthLabel}`}
           </span>
           <ChevronRight size={18} aria-hidden="true" />
@@ -793,7 +806,7 @@ function Dashboard({
             <input
               type="date"
               value={averageStartDate}
-              max={averageEndDate || today}
+              max={averageEndDate && averageEndDate < yesterday ? averageEndDate : yesterday}
               onChange={event => {
                 setCustomAverageRange(true);
                 setAverageStartDate(event.target.value);
@@ -806,7 +819,7 @@ function Dashboard({
               type="date"
               value={averageEndDate}
               min={averageStartDate || undefined}
-              max={today}
+              max={yesterday}
               onChange={event => {
                 setCustomAverageRange(true);
                 setAverageEndDate(event.target.value);
@@ -821,7 +834,7 @@ function Dashboard({
         )}
         {invalidAverageRange && (
           <p className="interval-range-error" role="alert">
-            Selecciona un intervalo válido: la fecha inicial debe ser anterior o igual a la final.
+            Selecciona las dos fechas de un intervalo válido hasta ayer; no se puede incluir el día actual.
           </p>
         )}
         <div className="monthly-summary-grid">

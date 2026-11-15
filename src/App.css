@@ -674,6 +674,21 @@ tr:hover {
   border: 1px solid #30333a;
 }
 
+table.consumptions-table tbody tr,
+table.summary-meals-table tbody tr {
+  -webkit-tap-highlight-color: transparent;
+}
+
+table.consumptions-table tbody tr:hover,
+table.summary-meals-table tbody tr:hover {
+  background: transparent;
+}
+
+.app-dark table.consumptions-table tbody tr:hover td,
+.app-dark table.summary-meals-table tbody tr:hover td {
+  background: transparent;
+}
+
 .app-dark .formula-card {
   border-left-color: #ff375f;
   background: #20232a;
