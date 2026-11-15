@@ -8,7 +8,9 @@ import Alimentos from './pages/Alimentos';
 import Objetivos from './pages/Objetivos';
 import './App.css';
 
-const APP_VERSION = packageJson.version || 'dev';
+const APP_VERSION = packageJson.version
+  ? packageJson.version.split('.').slice(0, 2).join('.')
+  : 'dev';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');

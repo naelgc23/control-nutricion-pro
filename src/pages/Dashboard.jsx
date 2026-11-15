@@ -834,7 +834,7 @@ function Dashboard({
         )}
         {invalidAverageRange && (
           <p className="interval-range-error" role="alert">
-            Selecciona las dos fechas de un intervalo válido hasta ayer; no se puede incluir el día actual.
+            Para descargar PDF selecciona las dos fechas de un intervalo válido hasta ayer, no se puede incluir el día actual.
           </p>
         )}
         <div className="monthly-summary-grid">
