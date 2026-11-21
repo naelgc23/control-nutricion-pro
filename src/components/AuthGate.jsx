@@ -1,10 +1,11 @@
 import React from 'react'
 import { useAuth } from '../context/AuthContext'
 import Login from '../pages/Login'
+import VerifyEmail from '../pages/VerifyEmail'
 import '../styles/Auth.css'
 
 export default function AuthGate({ children }) {
-  const { user, loading } = useAuth()
+  const { user, emailVerified, loading } = useAuth()
 
   if (loading) {
     return (
@@ -31,6 +32,10 @@ export default function AuthGate({ children }) {
 
   if (!user) {
     return <Login />
+  }
+
+  if (!emailVerified) {
+    return <VerifyEmail />
   }
 
   return children

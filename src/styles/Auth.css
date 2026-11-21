@@ -114,6 +114,20 @@
   text-align: center;
 }
 
+.auth-text {
+  margin: 0 0 10px;
+  color: #d0d1d5;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.auth-email {
+  color: #f5f5f7;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
 .auth-label {
   display: block;
   margin: 14px 0 7px;
@@ -206,6 +220,11 @@
 
 .auth-link:hover:not(:disabled) {
   color: #ff8199;
+}
+
+.auth-link:disabled {
+  color: #777a83;
+  cursor: default;
 }
 
 .auth-message {

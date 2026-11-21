@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  sendEmailVerification,
   deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential
@@ -42,18 +43,33 @@ export function authErrorMessage(error) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [verificationSendError, setVerificationSendError] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
+      setEmailVerified(currentUser?.emailVerified ?? false)
+      if (!currentUser || currentUser.emailVerified) {
+        setVerificationSendError('')
+      }
       setLoading(false)
     })
     return unsubscribe
   }, [])
 
-  const register = (email, password) =>
-    createUserWithEmailAndPassword(auth, email, password)
+  const register = async (email, password) => {
+    const credential = await createUserWithEmailAndPassword(auth, email, password)
+    try {
+      await sendEmailVerification(credential.user)
+      setVerificationSendError('')
+    } catch (error) {
+      console.error('No se pudo enviar el correo de verificación', error)
+      setVerificationSendError(authErrorMessage(error))
+    }
+    return credential
+  }
 
   const login = (email, password) =>
     signInWithEmailAndPassword(auth, email, password)
@@ -61,6 +77,31 @@ export function AuthProvider({ children }) {
   const logout = () => signOut(auth)
 
   const resetPassword = (email) => sendPasswordResetEmail(auth, email)
+
+  const resendVerification = async () => {
+    const current = auth.currentUser
+    if (!current) {
+      throw new Error('No hay una sesión activa para reenviar la verificación.')
+    }
+    await sendEmailVerification(current)
+    setVerificationSendError('')
+  }
+
+  const refreshVerification = useCallback(async () => {
+    const current = auth.currentUser
+    if (!current) {
+      setEmailVerified(false)
+      return false
+    }
+
+    await current.reload()
+    const verified = current.emailVerified
+    if (verified) {
+      await current.getIdToken(true)
+    }
+    setEmailVerified(verified)
+    return verified
+  }, [])
 
   // Apple exige poder eliminar la cuenta desde la app.
   // Pide la contraseña, borra los datos de la nube y después la cuenta.
@@ -85,7 +126,19 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const value = { user, loading, register, login, logout, resetPassword, deleteAccount }
+  const value = {
+    user,
+    emailVerified,
+    verificationSendError,
+    loading,
+    register,
+    login,
+    logout,
+    resetPassword,
+    resendVerification,
+    refreshVerification,
+    deleteAccount
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
