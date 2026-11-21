@@ -73,6 +73,12 @@ body {
   gap: 9px;
 }
 
+.brand-copy {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+}
+
 .brand-mark {
   display: block;
   width: 34px;
@@ -90,11 +96,11 @@ body {
 .app-version {
   display: inline-block;
   flex: 0 0 auto;
-  padding: 5px 9px;
+  padding: 2px 7px;
   border-radius: 999px;
   background: #1b1d22;
   color: #92949b;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 700;
   border: 1px solid #30333a;
 }

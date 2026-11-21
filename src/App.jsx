@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import packageJson from '../package.json';
 import { Home, ClipboardList, Utensils, Target } from 'lucide-react';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import AccountButton from './components/AccountButton';
 import Dashboard from './pages/Dashboard';
 import Registro from './pages/Registro';
 import Alimentos from './pages/Alimentos';
@@ -51,9 +52,12 @@ function App() {
       <header className="app-header">
         <div className="brand-lockup">
           <img className="brand-mark" src="/nutrack-mark.png" alt="" />
-          <h1>Nutrack</h1>
+          <div className="brand-copy">
+            <h1>Nutrack</h1>
+            <div className="app-version">v{APP_VERSION}</div>
+          </div>
         </div>
-        <div className="app-version">v{APP_VERSION}</div>
+        <AccountButton />
       </header>
 
       <main className="tab-content">
