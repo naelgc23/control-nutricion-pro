@@ -56,16 +56,18 @@ export default function AccountButton() {
                 <button type="button" className="auth-button auth-button-logout" onClick={logout}>
                   Cerrar sesión
                 </button>
-                <button
-                  type="button"
-                  className="auth-button auth-button-danger"
-                  onClick={() => setConfirmingDelete(true)}
-                >
-                  Eliminar cuenta
-                </button>
-                <button type="button" className="auth-link account-cancel" onClick={close}>
-                  Cancelar
-                </button>
+                <div className="account-modal-actions">
+                  <button type="button" className="auth-link" onClick={close}>
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="auth-link"
+                    onClick={() => setConfirmingDelete(true)}
+                  >
+                    Eliminar cuenta
+                  </button>
+                </div>
               </>
             ) : (
               <>

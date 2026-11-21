@@ -299,8 +299,10 @@
   line-height: 1.4;
 }
 
-.account-cancel {
-  margin-top: 12px;
+.account-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 
 @media (max-width: 360px) {
